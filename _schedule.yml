@@ -4,7 +4,7 @@
 # Add or remove rows to match the number of class meetings in the semester.
 
 sessions:
-  - topic: "Course intro & Regression Review"
+  - topic: "Course intro & Review"
     prep: ""
     turn_in: ""
     Other: ""
@@ -60,10 +60,10 @@ sessions:
     prep: ""
     turn_in: ""
     Other: ""
-  - topic: "Growth Models"
+  - topic: "Mini Project Presentations"
     prep: ""
     turn_in: ""
-    Other: "Mini Project Presentations"
+    Other: ""
   - topic: "Finals Week"
     prep: ""
     turn_in: ""
