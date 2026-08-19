@@ -17,10 +17,10 @@ website:
         text: Lectures
       - href: labs.qmd
         text: R Labs
-      - href: research-connections.qmd
-        text: Research Connections
+      - href: methods_walk_through.qmd
+        text: Methods Walk Through
       - href: fin_proj.qmd
-        text: Final Project
+        text: Mini Projects
   
 
 format:

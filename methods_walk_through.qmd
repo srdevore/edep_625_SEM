@@ -1,0 +1,12 @@
+---
+title: "Methods Walk Through"
+listing:
+  contents:
+    - methods_walk_through_template.qmd
+  type: table
+  fields: [title, description]
+  field-display-names:
+    description: "Download"
+  sort-ui: false
+  filter-ui: false
+---
