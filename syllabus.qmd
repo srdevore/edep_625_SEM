@@ -22,46 +22,67 @@ The core focus will be on path analysis, confirmatory factor analysis, and laten
 
 The focus of this course will be hands-on and lab oriented. 
 
-## Learning Objectives
+## Course Learning Objectives
 
 By the end of this course, students will:
 
 - Understand the kinds of research questions that can and cannot be answered by SEM models. 
-- Build path analysis, confirmatory factor analysis and latent variable path analysis models with academic rigor
-- Apply foundational knowledge of SEM to their own research projects
+- Build measured variable path analysis, confirmatory factor analysis and latent variable path analysis models with academic rigor
+- Have a basic understanding of how MVPA, CFA, and LVPA can be extended (ex: longitudinal, multi-group)
+- Build understanding of SEM research in their field and datasets available to answer questions.
+
+## Program Objectives 
+
+See the departmental [site](https://coe.hawaii.edu/edep/programs/gcert-ms/)
+
+## Advanced Degree Learning Objectives
+
+See the graduate division [site](https://manoa.hawaii.edu/graduate/advanced-degree-institutional-learning-objectives-ilo/)
 
 ## Required Materials
 
-- No textbooks are required. Readings are linked in the course schedule.
+- No textbooks are required. Preparatory materials and slides are linked in the course schedule.
 - Laptop with internet connection
-
-
+- R (free software) 
+- Onyx (free software)
 
 ## Course Policies
 
 ### Attendance
 
-This class is discussion and lab focused. In-person attendance & active participation are expected. In-class work, labs, quizzes, etc may be assigned in class and cannot be made up if the student is not present. 
+This class is discussion and lab focused. In-person attendance (on time) & active participation are expected. In-class work, labs, quizzes, discussion prompts, etc will be assigned in class and cannot be made up if the student is not present.  
 
-Class materials (slide decks and other materials) will be provided by the instructor and made available through the EDEP 625 website. Preparatory materisl will be linked. 
+### Assignments
 
-Assignments are expected to be handed in on time except. You are welcome to work with other students on homework, although you are expected to submit your own work with explanations in your own words.
+Assignments are expected to be handed in on time. You are welcome to work with other students on homework, although you are expected to submit your own work with explanations in your own words.
 
-## Assignments
+#### Preparatory materials
 
-Preparatory materials: These are readings or videos that introduce the topics we'll cover in class and should be done prior to class. 
+These are readings or videos that introduce the topics we'll cover in class and should be completed prior to class. Graded in-class work may be based on these materials.
 
-In-class assignments: throught the semester, students will complete assignments in class.
+#### In-class assignments
 
-Labs: Most weeks part of the class time we will be labs, which are an opportunity for you to apply what we discuss in class and build models.
+Throughout the semester, students will complete a variety of activities in class for a grade. These are generally graded on a participation basis.
 
-Data search: You will need one or more large datasets from your field that you can use for mini projects. Details and requirements will be forthcoming. 
+#### Labs
 
-Mini projects: Instead of a final paper, students will complete three mini projects on the three key models covered. This will be an extension of in-class labs we do and will rely on questions and data relevant to the student's field. These are not full research papers. Details will be forthcoming. 
+Most weeks part of the class time we will be labs, which are an opportunities for students to apply what we discuss in class and build models.
 
-Research connections: Students will identify papers in their field that use one of the three key models discussed in the class and will present it to the class. Students will also keep information on classmates' presentations in order to better understand how SEM models are used in a variety of fields and contexts. 
+#### Data search
 
-Review: While not formally graded, students are expected to spend a few hours each week reviewing course materials, labs, and otherwise solidifying their understanding of SEM. Students are encouraged to form study groups for this.
+You will need one or more large datasets from your field that you can use for mini projects. We will start to identify these early in the semester.
+
+#### Mini projects 
+
+Students will complete three mini projects on the three key models covered. This will be an extension of in-class labs we do and will rely on questions and data relevant to the student's field. These are not full research papers. Details will be forthcoming. Students will present on one of these to the class. 
+
+#### Research connections
+
+Students will identify papers in their field that use one of the three key models discussed in the class and will present it to the class. Students will also keep information on classmates' presentations in order to better understand how SEM models are used in a variety of fields and contexts. 
+
+#### Review
+
+While not formally graded, students are expected to spend a few hours each week reviewing course materials, labs, and otherwise solidifying their understanding of SEM. Students are encouraged to form study groups for this.
 
 ## Grading
 
@@ -75,9 +96,14 @@ Review: While not formally graded, students are expected to spend a few hours ea
 | Mini project 2 | [20%] |
 | Mini project 3 | [20%] |
 
-### Academic integrity
 
-[Academic integrity statement.]
+# AI Fair Use
+For the purposes of this course: 
+
+# Academic integrity
+
+Violations of academic integrity include, but are not limited to, cheating, fabrication, tampering, plagiarism, or facilitating such activities. Failure to meet this expectation will result in failure of the course and possible dismissal from the program. Plagiarism means using another's words, ideas, materials or work without properly acknowledging and documenting the source. Students are responsible for knowing the rules governing the use of another's work or materials and for acknowledging and documenting the source appropriately. Although I encourage collaboration with peers, all work that candidates ultimately submit in this course must be their own in their own words. If you are in doubt about whether your work is paraphrased or plagiarized, see the UH General and Graduate Information Catalog under [Student Regulations](https://manoa.hawaii.edu/studentsuccess/conduct-code/) and the UH Student Conduct Code for specific guidelines related to ethical behavior.
+
 
 ### Accommodations
 

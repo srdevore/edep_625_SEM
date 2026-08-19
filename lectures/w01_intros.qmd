@@ -14,8 +14,9 @@ release: week 2
 
 Agenda: 
 
-1. Syllabus
-2. Acceptable AI use
+1. Introductions
+2. Syllabus
+3. Acceptable AI use
 3. Terms: specification, identification, fit, interpretation, reporting
 3. Scavenger hunt: Finding datasets
 
