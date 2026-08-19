@@ -1,6 +1,6 @@
 ---
-title: "Research Connections"
-description: '<a href="research-connections.pdf" download>Download PDF</a>'
+title: "Methods Walk-through"
+description: '<a href="Methods Walk-through.pptx" download>Download PDF</a>'
 format:
   html:
     toc: true
@@ -11,7 +11,7 @@ format:
 ---
 
 ::: {.content-visible when-format="html"}
-[Download PDF](research-connections.pdf){.btn .btn-primary download="research-connections.pdf" role="button"}
+[Download PDF](Methods Walk-through.pptx){.btn .btn-primary download="Methods Walk-through.pptx" role="button"}
 :::
 
-Instructions for Research Connections Presentation
+Template for Methods Walk-through Presentation

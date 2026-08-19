@@ -50,7 +50,7 @@ See the graduate division [site](https://manoa.hawaii.edu/graduate/advanced-degr
 
 ### Attendance
 
-This class is discussion and lab focused. In-person attendance (on time) & active participation are expected. In-class work, labs, quizzes, discussion prompts, etc will be assigned in class and cannot be made up if the student is not present.  
+This class is discussion and lab focused. In-person, on-time attendance & active participation are expected. In-class work, labs, quizzes, discussion prompts, etc will be assigned in class and cannot be made up if the student is not present.  
 
 ### Assignments
 
@@ -76,7 +76,7 @@ You will need one or more large datasets from your field that you can use for mi
 
 Students will complete three mini projects on the three key models covered. This will be an extension of in-class labs we do and will rely on questions and data relevant to the student's field. These are not full research papers. Details will be forthcoming. Students will present on one of these to the class. 
 
-#### Research connections
+#### Methods Walk-through
 
 Students will identify papers in their field that use one of the three key models discussed in the class and will present it to the class. Students will also keep information on classmates' presentations in order to better understand how SEM models are used in a variety of fields and contexts. 
 
@@ -91,7 +91,7 @@ While not formally graded, students are expected to spend a few hours each week 
 | In-class work | [10%] |
 | Labs | [10%] |
 | Data search | [10%] |
-| Research connections | [10%] |
+| Methods Walk-through | [10%] |
 | Mini project 1 | [20%] |
 | Mini project 2 | [20%] |
 | Mini project 3 | [20%] |

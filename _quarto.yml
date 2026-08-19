@@ -8,7 +8,7 @@ profile:
   default: student
 
 website:
-  title: "Course Name"
+  title: "EDEP 625 Structural Equation Modeling"
   navbar:
     left:
       - href: syllabus.qmd

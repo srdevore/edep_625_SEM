@@ -8,6 +8,7 @@ format:
     slide-number: true
     embed-resources: true
 release: week 2
+draft: true
 ---
 
 ## Welcome to SEM
