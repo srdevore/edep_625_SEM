@@ -16,9 +16,9 @@ format:
 
 ## Course Description
 
-This course is an introductory course to structural equation modeling (SEM). Throughout the course, we will build on regression fundamentals to build models that capture more complicated relationships than standard regression and which can be applied to a wider variety of use cases beyond basic predictive modeling. 
+This course is an introductory course to structural equation modeling (SEM). Throughout the course, we will build on regression fundamentals to build models that capture more complicated relationships than standard regression and which can be applied to a wider variety of use cases. 
 
-The core focus will be on path analysis, confirmatory factor analysis, and full latent variable path analysis. As we approach each model, we will discuss how to specify, identify, fit, and report on the models we build. 
+The core focus will be on path analysis, confirmatory factor analysis, and latent variable path analysis. As we approach each model, we will discuss how to specify, identify, fit, interpret, and report on the models we build. 
 
 The focus of this course will be hands-on and lab oriented. 
 
