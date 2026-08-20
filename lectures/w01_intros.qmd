@@ -1,0 +1,35 @@
+---
+title: "Test Lecture"
+date: today
+description: '<a href="lectures/test_lecture.pdf" download>Download PDF</a>'
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    embed-resources: true
+release: week 2
+draft: true
+---
+
+## Welcome to SEM
+
+Agenda: 
+
+1. Introductions
+2. Syllabus
+3. Acceptable AI use
+3. Terms: specification, identification, fit, interpretation, reporting
+3. Scavenger hunt: Finding datasets
+
+
+::: {.content-visible when-profile="teacher"}
+::: {.fragment}
+Answer: Multivariate
+:::
+:::
+
+::: {.content-visible when-profile="teacher"}
+::: {.notes}
+ask students to introduce themselves
+:::
+:::

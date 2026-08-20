@@ -2,7 +2,7 @@
 title: "Assignments"
 listing:
   contents:
-    - final-project/*.qmd
+    - mini-projects/*.qmd
   type: table
   fields: [title, description]
   field-display-names:

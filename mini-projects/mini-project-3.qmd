@@ -1,0 +1,16 @@
+---
+title: "Mini Project 3"
+description: '<a href="mini-projects/mini-project-3.pdf" download>Download PDF</a>'
+format:
+  html:
+    toc: true
+  typst:
+    margin:
+      x: 1in
+      y: 1in
+---
+
+::: {.content-visible when-format="html"}
+[Download PDF](mini-project-3.pdf){.btn .btn-primary download="mini-project-3.pdf" role="button"}
+:::
+
