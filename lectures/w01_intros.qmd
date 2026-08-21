@@ -18,8 +18,9 @@ Agenda:
 1. Introductions
 2. Syllabus
 3. Acceptable AI use
-3. Terms: specification, identification, fit, interpretation, reporting
-3. Scavenger hunt: Finding datasets
+4. Terms: specification, identification, fit, interpretation, reporting
+5. Scavenger hunt: Finding datasets
+6. R Intro to R & Intro to lab data 
 
 
 ::: {.content-visible when-profile="teacher"}

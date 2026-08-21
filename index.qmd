@@ -1,4 +1,16 @@
 ---
+# PDF (via Typst) alongside HTML so students can download this page, matching
+# the syllabus / mini-project pattern. format-links is off because Quarto 1.10
+# labels the auto sidebar link "Typst" and duplicates it if you rename it —
+# the button below is the download entry point.
+format-links: false
+format:
+  html:
+    toc: true
+  typst:
+    margin:
+      x: 1in
+      y: 1in
 ---
 
 ```{r}
@@ -16,6 +28,9 @@ cat(sprintf("| Start date | %s |\n", format(class_start_date, "%b %d, %Y")))
 cat(sprintf("| End date | %s |\n\n", format(class_end_date, "%b %d, %Y")))
 ```
 
+::: {.content-visible when-format="html"}
+[Download PDF](index.pdf){.btn .btn-primary download="index.pdf" role="button"}
+:::
 
 ## Schedule
 
