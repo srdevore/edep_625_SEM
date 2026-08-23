@@ -17,10 +17,9 @@ Agenda:
 
 1. Introductions
 2. Syllabus
-3. Acceptable AI use
-4. Terms: specification, identification, fit, interpretation, reporting
-5. Scavenger hunt: Finding datasets
+3. Acceptable AI use guide for F2026
 6. R Intro to R & Intro to lab data 
+5. Homework: Scavenger hunt: Finding datasets; review videos for variance, covariance, correlation. 
 
 
 ::: {.content-visible when-profile="teacher"}

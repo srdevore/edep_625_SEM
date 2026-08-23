@@ -13,7 +13,7 @@ sessions:
     turn_in: "Datasets"
     Other: ""
   - topic: "Measured Variable Path Analysis (MVPA): Model specification"
-    prep: ""
+    prep: "[Myrberg & Rosen](resources/articles_from_data/Myrberg-Rosen_MVPA_true.pdf)"
     turn_in: ""
     Other: ""
   - topic: "MPVA: Model Identification & Fit"
