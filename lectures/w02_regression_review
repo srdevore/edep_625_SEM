@@ -1,5 +1,5 @@
 ---
-title: "Week 1: Introductions"
+title: "Regression, Variance, Covariance, Correlation, & Equation Systems Review"
 date: today
 description: '<a href="lectures/test_lecture.pdf" download>Download PDF</a>'
 format:
@@ -7,7 +7,7 @@ format:
     theme: simple
     slide-number: true
     embed-resources: true
-release: week 1
+release: week 2
 draft: true
 ---
 
@@ -15,11 +15,12 @@ draft: true
 
 Agenda: 
 
-1. Introductions
-2. Syllabus
-3. Acceptable AI use guide for F2026
-6. R Intro to R & Intro to lab data 
-5. Homework: Scavenger hunt: Finding datasets; review videos for variance, covariance, correlation. 
+1. 
+2. 
+3. 
+6. R  
+5.  
+
 
 
 ::: {.content-visible when-profile="teacher"}

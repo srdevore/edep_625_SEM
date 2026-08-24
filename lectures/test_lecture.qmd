@@ -1,5 +1,6 @@
 ---
-title: "Test Lecture"
+title: "Test Lecture draft true"
+draft: true
 date: today
 description: '<a href="lectures/test_lecture.pdf" download>Download PDF</a>'
 format:
