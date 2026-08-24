@@ -8,7 +8,7 @@ format:
     slide-number: true
     embed-resources: true
 release: week 1
-draft: true
+draft: false
 ---
 
 ## Agenda: 
@@ -49,8 +49,10 @@ ask students to introduce themselves
 ## Course Syllabus & Website
 
 - Link to course site in Lamaku 
+- Site: things for you to download (r labs, slide decks, data, syllabus, etc)
+- Lamaku: Assignments, grades
 - Syllabus
-- Overview of other resources
+- Overview of other pages
 
 ## AI use: 
 
