@@ -1,5 +1,6 @@
 ---
 title: "Mini Project 1"
+draft: true
 description: '<a href="mini-projects/mini-project-1.pdf" download>Download PDF</a>'
 format:
   html:
