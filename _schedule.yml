@@ -5,15 +5,15 @@
 
 sessions:
   - topic: "Course intro & Overview"
-    prep: ""
+    prep: "NA"
     turn_in: ""
     Other: ""
   - topic: "Review: Variance, covariance, correlation & systems of equations"
-    prep: ""
+    prep: "[Variance](https://www.youtube.com/watch?v=SzZ6GpcfoQY), [Covariance](https://www.youtube.com/watch?v=qtaqvPAeEJY), & [Correlation](https://www.youtube.com/watch?v=xZ_z8KWkhXE) refreshers"
     turn_in: "Datasets"
     Other: ""
   - topic: "Measured Variable Path Analysis (MVPA): Model specification"
-    prep: ""
+    prep: "[Myrberg & Rosen](resources/articles_from_data/Myrberg-Rosen_MVPA_true.pdf)"
     turn_in: ""
     Other: ""
   - topic: "MPVA: Model Identification & Fit"
