@@ -1,6 +1,7 @@
 ---
 title: "Lab: Arithmetic in R"
-date: 2026-05-24
+draft: true
+date: today
 description: '<a href="rlab-downloads/arithmetic.qmd" download="arithmetic.qmd">Download .qmd</a>'
 format: html
 ---

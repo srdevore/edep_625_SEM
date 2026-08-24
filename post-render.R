@@ -15,3 +15,12 @@ qmd_files <- list.files("rlabs", pattern = "\\.qmd$", full.names = TRUE)
 for (f in qmd_files) {
   file.copy(f, file.path(dest_dir, basename(f)), overwrite = TRUE)
 }
+
+# Data files used by the labs ship alongside the .qmd source, so the "Data"
+# column on the listing has something to point at. Quarto does not copy
+# these on its own -- they are not referenced by any rendered href.
+data_files <- list.files("rlabs", pattern = "\\.(csv|tsv|rds|xlsx|sav|dta)$",
+                         full.names = TRUE, ignore.case = TRUE)
+for (f in data_files) {
+  file.copy(f, file.path(dest_dir, basename(f)), overwrite = TRUE)
+}

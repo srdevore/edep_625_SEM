@@ -11,9 +11,7 @@ release: week 1
 draft: true
 ---
 
-## Welcome to SEM
-
-Agenda: 
+## Agenda: 
 
 1. Introductions
 2. Syllabus
@@ -21,15 +19,76 @@ Agenda:
 6. R Intro to R & Intro to lab data 
 5. Homework: Scavenger hunt: Finding datasets; review videos for variance, covariance, correlation. 
 
+## Introductions
+
+About Me: 
+- PhD Second Language Studies UHM 2022. 
+- Language Data Research / Language Data Scientist @ Amazon
+- Data Scientist @ Amplify
 
 ::: {.content-visible when-profile="teacher"}
 ::: {.fragment}
-Answer: Multivariate
+Projects in machine learning, human-AI interface, and generative AI
 :::
 :::
+
+## Introductions: Your turn!
+
+- Name
+- Department
+- MA/PhD
+- Research topics of interest
+- Favorite animal
 
 ::: {.content-visible when-profile="teacher"}
 ::: {.notes}
 ask students to introduce themselves
 :::
 :::
+
+## Course Syllabus & Website
+
+- Link to course site in Lamaku 
+- Syllabus
+- Overview of other resources
+
+## AI use: 
+
+Take 2-3 min to think about your use of generative AI. 
+
+- What do you use it for? When/why do you use it? 
+- What do you find it useful for? 
+- What do you find it useful for? 
+- In a class context, what do you consider appropriate? 
+
+## Data Intro
+
+- Programme for International Student Assessment (PISA)[https://www.oecd.org/en/about/programmes/pisa/pisa-test.html]
+- International test 
+- 15-year-olds’ ability to use reading, mathematics and science knowledge to meet real-life challenges
+- 90 countries/economies
+- Run every 3 years
+- Includes assessment, surveys of students, parents, school leaders
+- nationally representative sample
+
+## Pisa Key distinctions
+
+- **Achievement scores are plausible values.** 
+  - Each student sees a rotated subset of items; PISA uses a measurement model to draw a set of *plausible values* (`PV1`–`PV10`) representing where that student likely falls on the scale. 
+  - In research, the correct way to handle this is to run each test 10x and average results across the test results. 
+  - In practice, researchers sometimes take a single plausible value and treat it as the score or average across all 10 plausible values. 
+  - In this class, for teaching purposes, we average across the 10 scores
+- **Many variables are standardized** to be able to draw comparisons across diverse contexts.
+- We will work with (Pisa 2022)[https://supreme-disco-rrvpg9q5qjp2p5w.github.dev/]
+- files are large and so subsets of data are shared on the course site.
+
+
+## R Lab 1
+
+EDA of the small subset
+Key question: 
+What strikes you as important in this data set? What should we keep in mind as we model the data? 
+
+
+
+

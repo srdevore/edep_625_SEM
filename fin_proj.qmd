@@ -1,5 +1,6 @@
 ---
 title: "Assignments"
+draft: true
 listing:
   contents:
     - mini-projects/*.qmd

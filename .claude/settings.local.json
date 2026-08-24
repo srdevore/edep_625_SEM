@@ -16,7 +16,10 @@
       "Bash(Rscript -e 'source\\(\"R/schedule.R\"\\); print\\(class_schedule_df$Prep\\); print\\(sessionInfo\\(\\)$otherPkgs$yaml$Version\\)')",
       "Bash(quarto --version)",
       "Bash(quarto typst *)",
-      "Bash(quarto list *)"
+      "Bash(quarto list *)",
+      "Bash(awk 'NR==1{print; print \"NFIELDS:\" gsub\\(/,/,\",\"\\)+1}' FS=, pisa22_USA_cln_w1.csv)",
+      "Bash(awk 'NR==2' pisa22_USA_cln_w1.csv)",
+      "Bash(Rscript -e 'd <- read.csv\\(\"pisa22_USA_cln_w1.csv\"\\); str\\(d\\); summary\\(d\\); print\\(table\\(d$BOOKSHOME, useNA=\"ifany\"\\)\\); print\\(table\\(d$PAREDINT, useNA=\"ifany\"\\)\\); print\\(colSums\\(is.na\\(d\\)\\)\\)' 2>&1 | head -60)"
     ]
   }
 }
