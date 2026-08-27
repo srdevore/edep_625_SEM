@@ -1,8 +1,6 @@
 ---
 title: "Week 1: Introductions"
 date: today
-draft: false
-release: week 1
 description: '<a href="lectures/test_lecture.pdf" download>Download PDF</a>'
 format:
   revealjs:
@@ -58,7 +56,7 @@ ask students to introduce themselves
 
 ## AI Use
 
-Go to the (link)[https://lamaku.hawaii.edu/d2l/lms/quizzing/admin/quizzes_manage.d2l?ou=206398&dst=1] & complete the survey on AI use. 
+Go to the [link](https://lamaku.hawaii.edu/d2l/lms/quizzing/admin/quizzes_manage.d2l?ou=206398&dst=1) & complete the survey on AI use. 
 
 ::: {.content-visible when-profile="teacher"}
 ::: {.notes}
@@ -69,7 +67,7 @@ First in-class assignment
 
 ## AI use: 
 
-In pairs: Discuss your responses. Keep notes (here)[https://docs.google.com/document/d/1cd0gKMM4fR4YDINjWfNT_-OBK4vAN4IUcdum1WErU3w/edit?usp=sharing].
+In pairs: Discuss your responses. Keep notes [here](https://docs.google.com/document/d/1cd0gKMM4fR4YDINjWfNT_-OBK4vAN4IUcdum1WErU3w/edit?usp=sharing).
 
 - What are some positive or effective uses of AI? 
 - What are some negative or ineffective uses of AI? 
@@ -85,7 +83,7 @@ What AI use guidelines would you propose for the class?
 
 ## Data Intro
 
-- Programme for International Student Assessment (PISA)[https://www.oecd.org/en/about/programmes/pisa/pisa-test.html]
+- Programme for International Student Assessment [PISA](https://www.oecd.org/en/about/programmes/pisa/pisa-test.html)
 - International test 
 - 15-year-olds’ ability to use reading, mathematics and science knowledge to meet real-life challenges
 - 90 countries/economies
@@ -93,23 +91,26 @@ What AI use guidelines would you propose for the class?
 - Includes assessment, surveys of students, parents, school leaders
 - nationally representative sample
 
-## Pisa Key distinctions
+## Pisa Key Characteristics
 
 - **Achievement scores are plausible values.** 
   - Each student sees a rotated subset of items; PISA uses a measurement model to draw a set of *plausible values* (`PV1`–`PV10`) representing where that student likely falls on the scale. 
   - In research, the correct way to handle this is to run each test 10x and average results across the test results. 
   - In practice, researchers sometimes take a single plausible value and treat it as the score or average across all 10 plausible values. 
   - In this class, for teaching purposes, we average across the 10 scores
-- **Many variables are standardized** to be able to draw comparisons across diverse contexts.
-- We will work with (Pisa 2022)[https://supreme-disco-rrvpg9q5qjp2p5w.github.dev/]
+
+## Data: Key Characteristics
+
+- **Many variables are standardized** to be able to draw comparisons across diverse contexts. 
+- We will work with [Pisa 2022](https://supreme-disco-rrvpg9q5qjp2p5w.github.dev/)
 - files are large and so subsets of data are shared on the course site.
 
 
 ## R Lab 1
 
-EDA of the small subset
-Key question: 
-What strikes you as important in this data set? What should we keep in mind as we model the data? 
+- EDA of the small subset
+- Key question: 
+- What strikes you as important in this data set? What - should we keep in mind as we model the data? 
 
 ::: {.content-visible when-profile="teacher"}
 ::: {.notes}

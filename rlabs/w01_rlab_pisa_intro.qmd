@@ -1,6 +1,5 @@
 ---
 title: "Lab: Familiarizing with PISA Data"
-draft: false
 date: today
 description: '<a href="rlab-downloads/w01_rlab_pisa_intro.qmd" download="w01_rlab_pisa_intro.qmd">Download .qmd</a>'
 data: '<a href="rlab-downloads/w01_data_pisa22_USA_cln.csv" download="w01_data_pisa22_USA_cln.csv">w01_data_pisa22_USA_cln.csv</a>'
@@ -25,8 +24,7 @@ This file is a cleaned subset that includes three variables for U.S. students.
 | `READ_AVG` | Effectively the reading literacy score (technically the mean of the plausible values)|
 | `BOOKSHOME` | Books in the home, an ordered 1–5 Likert-style response |
 
-
-3: Completed ISCED 1 (Primary school education, usually equivalent to finishing roughly 3rd grade).6: Completed an intermediate level of primary education (typically finishing roughly 6th grade / elementary school).9: Completed ISCED 2 (Lower secondary education / Middle school, finishing roughly 9th grade).12: Completed ISCED 3A (Upper secondary education / High School Graduate with a standard diploma).14.5: Completed ISCED 4 or 5B (Non-university tertiary education / Associate Degree or vocational/technical credentials). The decimal accounts for a standardized international average weight assigned to these shorter degree tracks.16: Completed ISCED 5A or 6 (Tertiary higher education / Bachelor’s Degree or higher, e.g., Master's, Ph.D.).
+See [Pisa Codebook](https://www.oecd.org/en/data/datasets/pisa-2022-database.html#codebook) for details on what each variable 
 
 ## Setup
 
