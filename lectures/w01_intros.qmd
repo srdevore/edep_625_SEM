@@ -1,30 +1,31 @@
 ---
 title: "Week 1: Introductions"
 date: today
+draft: false
+release: week 1
 description: '<a href="lectures/test_lecture.pdf" download>Download PDF</a>'
 format:
   revealjs:
     theme: simple
     slide-number: true
     embed-resources: true
-release: week 1
-draft: false
 ---
 
 ## Agenda: 
 
 1. Introductions
 2. Syllabus
-3. Acceptable AI use guide for F2026
-6. R Intro to R & Intro to lab data 
+3. Acceptable AI use guide
+6. R Intro & lab data 
 5. Homework: Scavenger hunt: Finding datasets; review videos for variance, covariance, correlation. 
 
 ## Introductions
 
-About Me: 
-- PhD Second Language Studies UHM 2022. 
-- Language Data Research / Language Data Scientist @ Amazon
-- Data Scientist @ Amplify
+About Me
+
+- PhD Second Language Studies, UHM 
+- Language Data Researcher & Language Data Scientist @ Amazon
+- Data Scientist @ Amplify Education
 
 ::: {.content-visible when-profile="teacher"}
 ::: {.fragment}
@@ -54,14 +55,33 @@ ask students to introduce themselves
 - Syllabus
 - Overview of other pages
 
+
+## AI Use
+
+Go to the (link)[https://lamaku.hawaii.edu/d2l/lms/quizzing/admin/quizzes_manage.d2l?ou=206398&dst=1] & complete the survey on AI use. 
+
+::: {.content-visible when-profile="teacher"}
+::: {.notes}
+First in-class assignment
+:::
+:::
+
+
 ## AI use: 
 
-Take 2-3 min to think about your use of generative AI. 
+In pairs: Discuss your responses. Keep notes (here)[https://docs.google.com/document/d/1cd0gKMM4fR4YDINjWfNT_-OBK4vAN4IUcdum1WErU3w/edit?usp=sharing].
 
-- What do you use it for? When/why do you use it? 
-- What do you find it useful for? 
-- What do you find it useful for? 
-- In a class context, what do you consider appropriate? 
+- What are some positive or effective uses of AI? 
+- What are some negative or ineffective uses of AI? 
+- What's your response when people use AI for different activities (reports, assignments, etc)
+
+## AI Use
+
+Groups of 5: 
+
+Review what's on the google Doc
+
+What AI use guidelines would you propose for the class? 
 
 ## Data Intro
 
@@ -91,6 +111,26 @@ EDA of the small subset
 Key question: 
 What strikes you as important in this data set? What should we keep in mind as we model the data? 
 
+::: {.content-visible when-profile="teacher"}
+::: {.notes}
+Self-assign into one of 3 groups: 
+
+- Does not have R downloaded
+- Has used < 1 semester
+- Has used > 1 semester
+
+:::
+:::
+
+## R setup (if needed)
+
+Download R: https://cran.r-project.org/
+Download R Studio (now Posit): https://docs.posit.co/ide/user/#rstudio-ide-oss-downloads
+
+## Homework; 
+
+1. Data scavenger hunt assignment
+2. Prep videos for next week
 
 
 
