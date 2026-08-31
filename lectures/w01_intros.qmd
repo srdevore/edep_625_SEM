@@ -1,7 +1,7 @@
 ---
 title: "Week 1: Introductions"
 date: today
-description: '<a href="lectures/test_lecture.pdf" download>Download PDF</a>'
+description: '<a href="lectures/w01_intros.pdf" download="w01_intros.pdf">Download PDF</a>'
 format:
   revealjs:
     theme: simple

@@ -1,6 +1,6 @@
 ---
 title: "Methods Walk-through"
-description: '<a href="Methods-Walk-Through-Template.pptx" download>Download</a>'
+description: '<a href="methods-walk-through_SEM.pptx" download>Download</a>'
 format:
   html:
     toc: true
@@ -11,7 +11,7 @@ format:
 ---
 
 ::: {.content-visible when-format="html"}
-[Download](Methods-Walk-Through-Template.pptx){.btn .btn-primary download="Methods-Walk-Through-Template.pptx" role="button"}
+[Download](methods-walk-through_SEM.pptx){.btn .btn-primary download="methods-walk-through_SEM.pptx" role="button"}
 :::
 
 Template for Methods Walk-through Presentation

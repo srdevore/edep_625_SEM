@@ -35,6 +35,40 @@ lectures_metadata <- list(
 if (!dir.exists("lectures")) dir.create("lectures")
 write_yaml(lectures_metadata, "lectures/_metadata.yml")
 
+# === 3b. Lecture download links ========================================
+# The "Download" column on the lectures listing is the `description:` field
+# of each deck. Hand-writing that href means a deck copied from another one
+# keeps pointing at the wrong PDF. Instead, rewrite it here from the file's
+# own basename -- CI (publish.yml) renders each deck to
+# _site/lectures/<basename>.pdf via decktape, so the name always matches.
+
+lecture_qmds <- list.files("lectures", pattern = "\\.qmd$", full.names = TRUE)
+for (qmd in lecture_qmds) {
+  text <- tryCatch(readLines(qmd, warn = FALSE), error = function(e) NULL)
+  if (is.null(text) || length(text) < 2 || text[1] != "---") next
+  end <- which(text == "---")[2]
+  if (is.na(end)) next
+
+  slug <- sub("\\.qmd$", "", basename(qmd))
+  desired <- sprintf(
+    paste0("description: '<a href=\"lectures/%s.pdf\" ",
+           "download=\"%s.pdf\">Download PDF</a>'"),
+    slug, slug
+  )
+
+  desc_idx <- grep("^description:", text[2:(end - 1)])
+  if (length(desc_idx) == 0) {
+    text <- c(text[1:(end - 1)], desired, text[end:length(text)])
+    writeLines(text, qmd)
+  } else {
+    target <- desc_idx[1] + 1L
+    if (text[target] != desired) {
+      text[target] <- desired
+      writeLines(text, qmd)
+    }
+  }
+}
+
 # === 4. Release-date gating ============================================
 # A page with `release: "week N"` in its YAML is rendered as a draft until
 # one hour before the first class meeting of week N (i.e., students don't

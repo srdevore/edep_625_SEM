@@ -1,7 +1,7 @@
 ---
 title: "Test Lecture delay w3"
 date: today
-description: '<a href="lectures/test_lecture.pdf" download>Download PDF</a>'
+description: '<a href="lectures/test_lecture_delay_show.pdf" download="test_lecture_delay_show.pdf">Download PDF</a>'
 format:
   revealjs:
     theme: simple
