@@ -3,6 +3,11 @@ project:
   output-dir: _site
   pre-render: pre-render.R
   post-render: post-render.R
+  # Every course page is a .qmd. Listing them explicitly keeps maintainer
+  # notes like commands.md off the student site -- Quarto auto-ignores
+  # README.md and anything starting with "_", but not other .md files.
+  render:
+    - "**/*.qmd"
 
 profile:
   default: student
