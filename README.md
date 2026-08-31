@@ -92,4 +92,37 @@ In this presentation, press S to see the speaker notes version.
 download _teacher/lectures/test_lecture.html
 ```
 
+## 6. Unstage the Python virtualenv
+
+`.venv/` was missing from `.gitignore`, so a `git add .` staged every file in
+`site-packages` (thousands of them). `.gitignore` now excludes it, but that
+only applies to untracked files -- anything already staged has to be removed
+from the index by hand.
+
+To unstage **everything** you just staged, run `git reset` with no flags and no
+paths. It empties the index, leaves every file on disk untouched, and does not
+alter any commit -- safe because none of this was committed yet:
+
+```{bash}
+git reset
+```
+
+Then re-stage deliberately, now that `.gitignore` excludes `.venv/`:
+
+## 6. Unstage the Python virtualenv
+
+`.venv/` was missing from `.gitignore`, so a `git add .` staged every file in
+`site-packages` (thousands of them). `.gitignore` now excludes it, but that
+only applies to untracked files -- anything already staged has to be removed
+from the index by hand.
+
+To unstage **everything** you just staged, run `git reset` with no flags and no
+paths. It empties the index, leaves every file on disk untouched, and does not
+alter any commit -- safe because none of this was committed yet:
+
+```{bash}
+git reset
+```
+
+Then re-stage deliberately, now that `.gitignore` excludes `.venv/`:
 

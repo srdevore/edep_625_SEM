@@ -12,3 +12,10 @@ lectures/_metadata.yml
 /.quarto/
 **/*.quarto_ipynb
 .env
+
+# Python virtualenvs -- never commit; `git add .` will otherwise stage all
+# of site-packages.
+.venv/
+venv/
+__pycache__/
+*.pyc
