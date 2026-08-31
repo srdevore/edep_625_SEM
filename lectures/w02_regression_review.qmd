@@ -1,0 +1,438 @@
+---
+title: "Week 2: Regression, Variance, Covariance, Correlation, & Equation Systems Review"
+date: today
+description: '<a href="lectures/w02_regression_review.pdf" download="w02_regression_review.pdf">Download PDF</a>'
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    embed-resources: true
+    self-contained-math: true
+release: week 2
+draft: true
+---
+
+
+## Agenda
+
+1. Methods walk through expectations & sign up
+2. Updates: lecture updated
+3. Variance, covariance, correlation, regression, multiple regression, and interactions
+
+::: {.content-visible when-profile="teacher"}
+::: {.fragment}
+1: 10 min
+:::
+:::
+
+
+```{r}
+#| include: false
+library(tidyverse)
+
+pisa <- read_csv("rlabs/w01_data_pisa22_USA_cln.csv", show_col_types = FALSE)
+
+theme_set(theme_minimal(base_size = 16))
+
+# BOOKSHOME is coded 1, 2, 3, 4, 6, 7 in this extract -- there is no 5.
+# Derive the levels from the data so plots never invent a category.
+books_levels <- sort(unique(na.omit(pisa$BOOKSHOME)))
+
+fmt <- function(x, d = 2) formatC(x, format = "f", digits = d, big.mark = ",")
+
+coef_table <- function(model) {
+  broom::tidy(model) |>
+    mutate(
+      term = recode(term,
+        "(Intercept)"        = "Intercept",
+        "PAREDINT"           = "Parent education",
+        "BOOKSHOME"          = "Books at home",
+        "PAREDINT:BOOKSHOME" = "Parent education x Books"
+      ),
+      across(c(estimate, std.error, statistic), ~ round(.x, 2)),
+      p.value = ifelse(p.value < .001, "< .001", fmt(p.value, 3))
+    ) |>
+    rename(Term = term, Estimate = estimate, SE = std.error,
+           t = statistic, p = p.value) |>
+    knitr::kable()
+}
+```
+
+## Variance
+
+```{r}
+#| echo: false
+#| fig-height: 3.2
+#| fig-width: 9
+set.seed(625)
+samp <- pisa |>
+  filter(!is.na(READ_AVG)) |>
+  slice_sample(n = 60) |>
+  mutate(case = row_number())
+
+read_mean <- mean(samp$READ_AVG)
+
+ggplot(samp, aes(x = case, y = READ_AVG)) +
+  geom_segment(aes(xend = case, yend = read_mean),
+               colour = "grey65", linewidth = 0.4) +
+  geom_point(size = 2.4, alpha = 0.8, colour = "grey20") +
+  geom_hline(yintercept = read_mean, colour = "firebrick", linewidth = 1.2) +
+  annotate("text", x = 0, y = read_mean,
+           label = paste0("mean = ", fmt(read_mean, 1)),
+           colour = "firebrick", hjust = 0, vjust = -0.6, size = 5) +
+  labs(x = "Student", y = "Reading score")
+```
+
+Each grey line is one student's distance from the mean.
+For all `r fmt(sum(!is.na(pisa$READ_AVG)), 0)` students, $s^2$ = `r fmt(var(pisa$READ_AVG, na.rm = TRUE), 1)` and $s$ = `r fmt(sd(pisa$READ_AVG, na.rm = TRUE), 1)`.
+
+$$s^2 = \frac{\sum_{i=1}^{n}(y_i - \bar{y})^2}{n - 1}$$
+
+::: {.content-visible when-profile="teacher"}
+::: {.fragment}
+Target answer: a measure of how scattered the data is around the mean.
+:::
+:::
+
+::: {.content-visible when-profile="teacher"}
+::: {.notes}
+The grey segments are the deviations that get squared in the formula. Squaring
+is why the variance (11,296) is on an uninterpretable scale while the SD (106)
+is back in reading-score points.
+
+Original plan: Students should know this well. Show a scatterplot of the pisa
+reading out come with a mean bar and cases on the bottom (do a random selection
+that visualizes nicely) and ask them to describe what variance is. Target
+answer: measure of how scattered data is around the mean.
+:::
+:::
+
+## Covariance
+
+```{r}
+#| echo: false
+#| fig-height: 3.4
+#| fig-width: 9
+#| warning: false
+ggplot(pisa, aes(x = PAREDINT, y = READ_AVG)) +
+  geom_jitter(width = 0.45, alpha = 0.12) +
+  geom_smooth(method = "lm", se = FALSE, colour = "firebrick", linewidth = 1.2) +
+  labs(x = "Parent education (years)", y = "Reading score")
+```
+
+Covariance of reading score and parent education = **`r fmt(cov(pisa$READ_AVG, pisa$PAREDINT, use = "pairwise.complete.obs"), 2)`**
+
+$$\mathrm{cov}(x, y) = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{n - 1}$$
+
+How would you describe what covariance is? What are its units?
+
+::: {.content-visible when-profile="teacher"}
+::: {.fragment}
+Target answer: how two variables change in relation to each other. Not
+standardized. Units are reading-score points x years of schooling, which is
+why the number itself is hard to interpret.
+:::
+:::
+
+::: {.content-visible when-profile="teacher"}
+::: {.notes}
+Original plan: Also old hat to students. Show pisa reading outcome x PAREDINT
+and ask them to describe what covariance is. Show the line & covariance number.
+Target answer: how two variables change in relation to eachother. Not
+standarized. Units of ??
+:::
+:::
+
+## Correlation
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**Raw units**
+
+```{r}
+#| echo: false
+#| fig-height: 3.6
+#| fig-width: 4.5
+#| warning: false
+ggplot(pisa, aes(x = PAREDINT, y = READ_AVG)) +
+  geom_jitter(width = 0.45, alpha = 0.12) +
+  geom_smooth(method = "lm", se = FALSE, colour = "firebrick") +
+  labs(x = "Parent education (years)", y = "Reading score")
+```
+
+Covariance = **`r fmt(cov(pisa$READ_AVG, pisa$PAREDINT, use = "pairwise.complete.obs"), 2)`**
+:::
+
+::: {.column width="50%"}
+**Standardized (z scores)**
+
+```{r}
+#| echo: false
+#| fig-height: 3.6
+#| fig-width: 4.5
+#| warning: false
+pisa |>
+  mutate(z_pared = scale(PAREDINT)[, 1], z_read = scale(READ_AVG)[, 1]) |>
+  ggplot(aes(x = z_pared, y = z_read)) +
+  geom_jitter(width = 0.15, alpha = 0.12) +
+  geom_smooth(method = "lm", se = FALSE, colour = "firebrick") +
+  labs(x = "Parent education (SD)", y = "Reading score (SD)")
+```
+
+Correlation = **`r fmt(cor(pisa$READ_AVG, pisa$PAREDINT, use = "pairwise.complete.obs"), 3)`**
+:::
+
+::::
+
+$$r = \frac{\mathrm{cov}(x, y)}{s_x \, s_y}$$
+
+Same data, same shape. What is the difference between the two numbers?
+
+::: {.content-visible when-profile="teacher"}
+::: {.fragment}
+Target answer: correlation is standardized, so it ranges between -1 and 1 and
+is much easier to interpret. Covariance carries the original units.
+:::
+:::
+
+::: {.content-visible when-profile="teacher"}
+::: {.notes}
+The point clouds are identical apart from the axis labels. Dividing by the two
+SDs (`r fmt(sd(pisa$PAREDINT, na.rm = TRUE), 2)` and
+`r fmt(sd(pisa$READ_AVG, na.rm = TRUE), 2)`) is the only difference:
+49.54 / (2.67 x 106.28) = 0.174.
+
+Original plan: Also very well known to students. Show pisa reading outcome x
+PAREDINT correlation and covariance side x side and ask them to describe the
+difference between the two. Target answer: correlation is standardized, ranges
+between -1 and 1. easier to interpret.
+:::
+:::
+
+## Regression
+
+$$\hat{y} = b_0 + b_1 x_1$$
+
+```{r}
+#| echo: false
+#| fig-height: 3
+#| fig-width: 9
+#| warning: false
+m1 <- lm(READ_AVG ~ PAREDINT, data = pisa)
+
+ggplot(pisa, aes(x = PAREDINT, y = READ_AVG)) +
+  geom_jitter(width = 0.45, alpha = 0.12) +
+  geom_smooth(method = "lm", se = TRUE, colour = "firebrick", linewidth = 1.2) +
+  labs(x = "Parent education (years)", y = "Reading score")
+```
+
+```{r}
+#| echo: false
+coef_table(m1)
+```
+
+$R^2$ = `r fmt(summary(m1)$r.squared, 3)`, residual SE = `r fmt(sigma(m1), 1)`
+
+How do you interpret this?
+
+::: {.content-visible when-profile="teacher"}
+::: {.fragment}
+Target answer: we are predicting reading outcome from parent education. Each
+additional year of parent education predicts about
+`r fmt(coef(m1)[["PAREDINT"]], 2)` more reading-score points. $R^2$ and the
+residual SE are the indicators of how good those predictions are.
+:::
+:::
+
+::: {.content-visible when-profile="teacher"}
+::: {.fragment}
+The reminder you asked for: the slope is just the covariance rescaled.
+
+$$b_1 = \frac{\mathrm{cov}(x, y)}{s^2_x} = \frac{49.54}{7.11} = 6.97
+\qquad
+r = b_1 \frac{s_x}{s_y} = 6.97 \times \frac{2.67}{106.28} = 0.174$$
+
+Same information as the covariance and the correlation, in prediction units.
+:::
+:::
+
+::: {.content-visible when-profile="teacher"}
+::: {.notes}
+$R^2$ is only 0.03 here, so parent education alone explains 3% of the variance
+in reading. Worth flagging that a real, significant effect can still be a weak
+predictor.
+
+Original plan: show a regression of pisa reading outcome ~ PAREDINT. Show the
+plot and also the output. Ask students to interpret. Target answer: Predicting
+reading outcome from PAREDINT; indicators of how good the predictions are.
+Coefficient the same as correlation/covariance (Remind me). show the structural
+equation y = b0 + b1x1 in nice latex formatting.
+:::
+:::
+
+## Multiple Regression
+
+$$\hat{y} = b_0 + b_1 x_1 + b_2 x_2$$
+
+```{r}
+#| echo: false
+#| fig-height: 3
+#| fig-width: 9
+#| warning: false
+m2 <- lm(READ_AVG ~ PAREDINT + BOOKSHOME, data = pisa)
+
+grid2 <- expand_grid(
+  PAREDINT  = seq(3, 16, length.out = 50),
+  BOOKSHOME = books_levels
+) |>
+  mutate(READ_AVG = predict(m2, newdata = pick(everything())))
+
+pisa |>
+  filter(!is.na(BOOKSHOME)) |>
+  ggplot(aes(x = PAREDINT, y = READ_AVG, colour = factor(BOOKSHOME, levels = books_levels))) +
+  geom_jitter(width = 0.45, alpha = 0.10) +
+  geom_line(data = grid2, aes(group = factor(BOOKSHOME, levels = books_levels)), linewidth = 1.2) +
+  scale_colour_viridis_d(end = 0.9) +
+  labs(x = "Parent education (years)", y = "Reading score",
+       colour = "Books at home")
+```
+
+```{r}
+#| echo: false
+coef_table(m2)
+```
+
+$R^2$ = `r fmt(summary(m2)$r.squared, 3)` (was `r fmt(summary(m1)$r.squared, 3)` with parent education alone)
+
+How do you interpret this?
+
+::: {.content-visible when-profile="teacher"}
+::: {.fragment}
+Target answer: how parent education predicts reading outcome controlling for
+books at home, and vice versa. The lines are parallel because each predictor
+gets one slope that holds at every level of the other.
+:::
+:::
+
+::: {.content-visible when-profile="teacher"}
+::: {.notes}
+The parent-education slope drops from `r fmt(coef(m1)[["PAREDINT"]], 2)` to
+`r fmt(coef(m2)[["PAREDINT"]], 2)` once books at home is in the model. Much of
+what looked like a parent-education effect was shared with books at home. This
+is the setup for the mediation problem at the end.
+
+Original plan: Show a regression of pisa reading outcome ~ PAREDINT +
+BOOKSHOME. Show a plot and also output. Ask students to interpret. Target
+answer: how PAREDINT predicts reading outcome controlling for BOOKSHOME & vice
+versa. show the structural equation y = b0 + b1x1 + b2x2 in nice latex
+formatting.
+:::
+:::
+
+## Interaction in Multiple Regression
+
+$$\hat{y} = b_0 + b_1 x_1 + b_2 x_2 + b_3 (x_1 \times x_2)$$
+
+```{r}
+#| echo: false
+#| fig-height: 3
+#| fig-width: 9
+#| warning: false
+m3 <- lm(READ_AVG ~ PAREDINT * BOOKSHOME, data = pisa)
+
+grid3 <- expand_grid(
+  PAREDINT  = seq(3, 16, length.out = 50),
+  BOOKSHOME = books_levels
+) |>
+  mutate(READ_AVG = predict(m3, newdata = pick(everything())))
+
+pisa |>
+  filter(!is.na(BOOKSHOME)) |>
+  ggplot(aes(x = PAREDINT, y = READ_AVG, colour = factor(BOOKSHOME, levels = books_levels))) +
+  geom_jitter(width = 0.45, alpha = 0.10) +
+  geom_line(data = grid3, aes(group = factor(BOOKSHOME, levels = books_levels)), linewidth = 1.2) +
+  scale_colour_viridis_d(end = 0.9) +
+  labs(x = "Parent education (years)", y = "Reading score",
+       colour = "Books at home")
+```
+
+```{r}
+#| echo: false
+coef_table(m3)
+```
+
+$R^2$ = `r fmt(summary(m3)$r.squared, 3)`
+
+How do you interpret this? Are the main effects more or less important than the interaction effect?
+
+::: {.content-visible when-profile="teacher"}
+::: {.fragment}
+Target answer: how parent education predicts reading controlling for books at
+home and vice versa, AND how the two together predict reading. The lines are
+no longer parallel: the parent-education slope depends on how many books are
+in the home.
+:::
+:::
+
+::: {.content-visible when-profile="teacher"}
+::: {.fragment}
+Here the main effects do the work. Adding the interaction moves $R^2$ from
+`r fmt(summary(m2)$r.squared, 3)` to `r fmt(summary(m3)$r.squared, 3)` and the
+interaction term is not significant (p = `r fmt(summary(m3)$coefficients["PAREDINT:BOOKSHOME", 4], 3)`).
+:::
+:::
+
+::: {.content-visible when-profile="teacher"}
+::: {.fragment}
+Key point: an interaction says the two predictors act *jointly* on reading.
+That is a different claim from a SEM-style model where parent education
+predicts books at home, and books at home predicts reading.
+:::
+:::
+
+::: {.content-visible when-profile="teacher"}
+::: {.notes}
+The main-effect coefficients look wild here (parent education goes slightly
+negative) because with an interaction in the model they are conditional on the
+other predictor being 0, which is outside the data range. If asked: centering
+fixes the interpretation, not the fit.
+
+Original plan: Show a regression of pisa reading outcome ~ PAREDINT + BOOKSHOME
++ PAREDINT x BOOKSHOME. Ask students to interpret. Target answer: how PAREDINT
+predicts reading outcome controlling for BOOKSHOME & vice versa AND how PAREDINT
+x BOOKSHOME together predict reading. Are main effects more or less important
+than the interaction effect? A key point is to distinguish this
+combined/interaction effect from SEM approaches where PAREDINT predicts
+BOOKSHOME and BOOKSHOME predicts reading (for example) show the structural
+equation y = b0 + b1x1 + B1x1*b2x2 in nice latex formatting.
+:::
+:::
+
+## Problem
+
+- We know there's a relationship between parent education & books in the home. We know that together they predict reading score. 
+- It is possible that parent education is one cause of the number of books in the home
+  - This is a mediation effect 
+
+$$\widehat{\text{Books}} = a_0 + a_1 (\text{ParentEd})$$
+
+$$\widehat{\text{Reading}} = b_0 + b_1 (\text{Books}) + b_2 (\text{ParentEd})$$
+
+Books at home is an *outcome* in the first equation and a *predictor* in the second. That cannot be captured by regression, multiple regression, or interaction effects.
+
+::: {.content-visible when-profile="teacher"}
+::: {.fragment}
+A single regression forces every variable to be either a predictor or an
+outcome, never both. Two equations estimated separately also cannot share
+information or test the indirect path. This is what systems of equations, and
+then SEM, are for.
+:::
+:::
+
+::: {.content-visible when-profile="teacher"}
+::: {.notes}
+Original plan: show the two equations for this. ^ cannot be captured by
+regression, multiple regression or interaction effects.
+:::
+:::
