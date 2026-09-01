@@ -1,5 +1,5 @@
 ---
-title: "Week 2: Regression, Variance, Covariance, Correlation, & Equation Systems Review"
+title: "Week 2: Review & SEM FUNdamentals"
 date: today
 description: '<a href="lectures/w02_regression_review.pdf" download="w02_regression_review.pdf">Download PDF</a>'
 format:
@@ -12,12 +12,13 @@ release: week 2
 draft: true
 ---
 
-
 ## Agenda
 
 1. Methods walk through expectations & sign up
-2. Updates: lecture updated
+2. Updates: lecture updated, office hrs updated
 3. Variance, covariance, correlation, regression, multiple regression, and interactions
+4. R lab: review 
+5. Homework: Example paper of Measured Variable Path Analysis
 
 ::: {.content-visible when-profile="teacher"}
 ::: {.fragment}
@@ -30,7 +31,7 @@ draft: true
 #| include: false
 library(tidyverse)
 
-pisa <- read_csv("rlabs/w01_data_pisa22_USA_cln.csv", show_col_types = FALSE)
+pisa <- read_csv("../rlabs/w01_data_pisa22_USA_cln.csv", show_col_types = FALSE)
 
 theme_set(theme_minimal(base_size = 16))
 
@@ -38,16 +39,34 @@ theme_set(theme_minimal(base_size = 16))
 # Derive the levels from the data so plots never invent a category.
 books_levels <- sort(unique(na.omit(pisa$BOOKSHOME)))
 
+# Mean-centred versions for the interaction model. Books at home starts at 1
+# and parent education at 3, so in an uncentred interaction the main effects
+# are slopes at "the other predictor = 0" -- a point off both scales, which
+# flips the parent-education coefficient negative for purely arithmetic
+# reasons. Centring moves that reference point to the mean, so the main
+# effects read as average slopes. The fit is untouched.
+pared_mean <- mean(pisa$PAREDINT, na.rm = TRUE)
+books_mean <- mean(pisa$BOOKSHOME, na.rm = TRUE)
+
+pisa <- pisa |>
+  mutate(
+    PAREDINT_c  = PAREDINT - pared_mean,
+    BOOKSHOME_c = BOOKSHOME - books_mean
+  )
+
 fmt <- function(x, d = 2) formatC(x, format = "f", digits = d, big.mark = ",")
 
 coef_table <- function(model) {
   broom::tidy(model) |>
     mutate(
       term = recode(term,
-        "(Intercept)"        = "Intercept",
-        "PAREDINT"           = "Parent education",
-        "BOOKSHOME"          = "Books at home",
-        "PAREDINT:BOOKSHOME" = "Parent education x Books"
+        "(Intercept)"            = "Intercept",
+        "PAREDINT"               = "Parent education",
+        "BOOKSHOME"              = "Books at home",
+        "PAREDINT:BOOKSHOME"     = "Parent education x Books",
+        "PAREDINT_c"             = "Parent education",
+        "BOOKSHOME_c"            = "Books at home",
+        "PAREDINT_c:BOOKSHOME_c" = "Parent education x Books"
       ),
       across(c(estimate, std.error, statistic), ~ round(.x, 2)),
       p.value = ifelse(p.value < .001, "< .001", fmt(p.value, 3))
@@ -55,6 +74,26 @@ coef_table <- function(model) {
     rename(Term = term, Estimate = estimate, SE = std.error,
            t = statistic, p = p.value) |>
     knitr::kable()
+}
+
+# Overall model test. The coefficient table gives one t-test per predictor;
+# this is the omnibus F comparing the whole model against an intercept-only
+# model, so students see model-level and coefficient-level significance
+# together.
+model_fit <- function(model) {
+  s <- summary(model)
+  f <- s$fstatistic
+  p <- pf(f[["value"]], f[["numdf"]], f[["dendf"]], lower.tail = FALSE)
+  sprintf(
+    "$R^2$ = %s, adj. $R^2$ = %s, $F$(%d, %s) = %s, $p$ %s, residual SE = %s",
+    fmt(s$r.squared, 3),
+    fmt(s$adj.r.squared, 3),
+    as.integer(f[["numdf"]]),
+    formatC(f[["dendf"]], format = "d", big.mark = ","),
+    fmt(f[["value"]], 1),
+    if (p < .001) "< .001" else paste("=", fmt(p, 3)),
+    fmt(sigma(model), 1)
+  )
 }
 ```
 
@@ -70,32 +109,28 @@ samp <- pisa |>
   slice_sample(n = 60) |>
   mutate(case = row_number())
 
-read_mean <- mean(samp$READ_AVG)
+read_mean <- mean(pisa$READ_AVG, na.rm = TRUE)
 
 ggplot(samp, aes(x = case, y = READ_AVG)) +
   geom_segment(aes(xend = case, yend = read_mean),
                colour = "grey65", linewidth = 0.4) +
   geom_point(size = 2.4, alpha = 0.8, colour = "grey20") +
-  geom_hline(yintercept = read_mean, colour = "firebrick", linewidth = 1.2) +
+  geom_hline(yintercept = read_mean, colour = "magenta", linewidth = 1.2) +
   annotate("text", x = 0, y = read_mean,
            label = paste0("mean = ", fmt(read_mean, 1)),
-           colour = "firebrick", hjust = 0, vjust = -0.6, size = 5) +
+           colour = "magenta", hjust = 0, vjust = -0.6, size = 5) +
   labs(x = "Student", y = "Reading score")
 ```
 
-Each grey line is one student's distance from the mean.
-For all `r fmt(sum(!is.na(pisa$READ_AVG)), 0)` students, $s^2$ = `r fmt(var(pisa$READ_AVG, na.rm = TRUE), 1)` and $s$ = `r fmt(sd(pisa$READ_AVG, na.rm = TRUE), 1)`.
-
 $$s^2 = \frac{\sum_{i=1}^{n}(y_i - \bar{y})^2}{n - 1}$$
+
+$s^2$ = `r fmt(var(pisa$READ_AVG, na.rm = TRUE), 1)` 
+$s$ = `r fmt(sd(pisa$READ_AVG, na.rm = TRUE), 1)`
 
 ::: {.content-visible when-profile="teacher"}
 ::: {.fragment}
-Target answer: a measure of how scattered the data is around the mean.
-:::
-:::
+Target answer: a measure of how scattered the data is around the mean. This is what we want to explain. WHY are students getting different scores. Causally: what causes differences in student scores. 
 
-::: {.content-visible when-profile="teacher"}
-::: {.notes}
 The grey segments are the deviations that get squared in the formula. Squaring
 is why the variance (11,296) is on an uninterpretable scale while the SD (106)
 is back in reading-score points.
@@ -116,26 +151,22 @@ answer: measure of how scattered data is around the mean.
 #| warning: false
 ggplot(pisa, aes(x = PAREDINT, y = READ_AVG)) +
   geom_jitter(width = 0.45, alpha = 0.12) +
-  geom_smooth(method = "lm", se = FALSE, colour = "firebrick", linewidth = 1.2) +
+  geom_smooth(method = "lm", se = FALSE, colour = "magenta", linewidth = 1.2) +
   labs(x = "Parent education (years)", y = "Reading score")
 ```
 
-Covariance of reading score and parent education = **`r fmt(cov(pisa$READ_AVG, pisa$PAREDINT, use = "pairwise.complete.obs"), 2)`**
-
 $$\mathrm{cov}(x, y) = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{n - 1}$$
 
-How would you describe what covariance is? What are its units?
+cov = `r fmt(cov(pisa$READ_AVG, pisa$PAREDINT, use = "pairwise.complete.obs"), 2)`
+
 
 ::: {.content-visible when-profile="teacher"}
 ::: {.fragment}
 Target answer: how two variables change in relation to each other. Not
 standardized. Units are reading-score points x years of schooling, which is
 why the number itself is hard to interpret.
-:::
-:::
 
-::: {.content-visible when-profile="teacher"}
-::: {.notes}
+
 Original plan: Also old hat to students. Show pisa reading outcome x PAREDINT
 and ask them to describe what covariance is. Show the line & covariance number.
 Target answer: how two variables change in relation to eachother. Not
@@ -143,12 +174,12 @@ standarized. Units of ??
 :::
 :::
 
-## Correlation
+## Correlation $$r = \frac{\mathrm{cov}(x, y)}{s_x \, s_y}$$
 
 :::: {.columns}
 
 ::: {.column width="50%"}
-**Raw units**
+Covariance
 
 ```{r}
 #| echo: false
@@ -157,7 +188,7 @@ standarized. Units of ??
 #| warning: false
 ggplot(pisa, aes(x = PAREDINT, y = READ_AVG)) +
   geom_jitter(width = 0.45, alpha = 0.12) +
-  geom_smooth(method = "lm", se = FALSE, colour = "firebrick") +
+  geom_smooth(method = "lm", se = FALSE, colour = "magenta") +
   labs(x = "Parent education (years)", y = "Reading score")
 ```
 
@@ -165,7 +196,7 @@ Covariance = **`r fmt(cov(pisa$READ_AVG, pisa$PAREDINT, use = "pairwise.complete
 :::
 
 ::: {.column width="50%"}
-**Standardized (z scores)**
+Correlation
 
 ```{r}
 #| echo: false
@@ -176,8 +207,8 @@ pisa |>
   mutate(z_pared = scale(PAREDINT)[, 1], z_read = scale(READ_AVG)[, 1]) |>
   ggplot(aes(x = z_pared, y = z_read)) +
   geom_jitter(width = 0.15, alpha = 0.12) +
-  geom_smooth(method = "lm", se = FALSE, colour = "firebrick") +
-  labs(x = "Parent education (SD)", y = "Reading score (SD)")
+  geom_smooth(method = "lm", se = FALSE, colour = "magenta") +
+  labs(x = "Parent education", y = "Reading score")
 ```
 
 Correlation = **`r fmt(cor(pisa$READ_AVG, pisa$PAREDINT, use = "pairwise.complete.obs"), 3)`**
@@ -187,17 +218,12 @@ Correlation = **`r fmt(cor(pisa$READ_AVG, pisa$PAREDINT, use = "pairwise.complet
 
 $$r = \frac{\mathrm{cov}(x, y)}{s_x \, s_y}$$
 
-Same data, same shape. What is the difference between the two numbers?
 
 ::: {.content-visible when-profile="teacher"}
 ::: {.fragment}
 Target answer: correlation is standardized, so it ranges between -1 and 1 and
 is much easier to interpret. Covariance carries the original units.
-:::
-:::
 
-::: {.content-visible when-profile="teacher"}
-::: {.notes}
 The point clouds are identical apart from the axis labels. Dividing by the two
 SDs (`r fmt(sd(pisa$PAREDINT, na.rm = TRUE), 2)` and
 `r fmt(sd(pisa$READ_AVG, na.rm = TRUE), 2)`) is the only difference:
@@ -219,11 +245,12 @@ $$\hat{y} = b_0 + b_1 x_1$$
 #| fig-height: 3
 #| fig-width: 9
 #| warning: false
-m1 <- lm(READ_AVG ~ PAREDINT, data = pisa)
+m1 <- lm(READ_AVG ~ PAREDINT_c, data = pisa)
 
+# Plotted on the raw scale: centring shifts the intercept, not the line.
 ggplot(pisa, aes(x = PAREDINT, y = READ_AVG)) +
   geom_jitter(width = 0.45, alpha = 0.12) +
-  geom_smooth(method = "lm", se = TRUE, colour = "firebrick", linewidth = 1.2) +
+  geom_smooth(method = "lm", se = TRUE, colour = "magenta", linewidth = 1.2) +
   labs(x = "Parent education (years)", y = "Reading score")
 ```
 
@@ -232,21 +259,21 @@ ggplot(pisa, aes(x = PAREDINT, y = READ_AVG)) +
 coef_table(m1)
 ```
 
-$R^2$ = `r fmt(summary(m1)$r.squared, 3)`, residual SE = `r fmt(sigma(m1), 1)`
+`r model_fit(m1)`
 
-How do you interpret this?
 
 ::: {.content-visible when-profile="teacher"}
 ::: {.fragment}
 Target answer: we are predicting reading outcome from parent education. Each
 additional year of parent education predicts about
-`r fmt(coef(m1)[["PAREDINT"]], 2)` more reading-score points. $R^2$ and the
+`r fmt(coef(m1)[["PAREDINT_c"]], 2)` more reading-score points. $R^2$ and the
 residual SE are the indicators of how good those predictions are.
-:::
-:::
 
-::: {.content-visible when-profile="teacher"}
-::: {.fragment}
+Parent education is mean-centred, so the intercept
+(`r fmt(coef(m1)[["(Intercept)"]], 1)`) is the predicted reading score at
+average parent education (`r fmt(pared_mean, 1)` years) rather than at zero
+years, which is off the scale. The slope is unchanged by centring.
+
 The reminder you asked for: the slope is just the covariance rescaled.
 
 $$b_1 = \frac{\mathrm{cov}(x, y)}{s^2_x} = \frac{49.54}{7.11} = 6.97
@@ -271,56 +298,48 @@ equation y = b0 + b1x1 in nice latex formatting.
 :::
 :::
 
-## Multiple Regression
+## Multiple Regression 1
 
 $$\hat{y} = b_0 + b_1 x_1 + b_2 x_2$$
 
 ```{r}
 #| echo: false
-#| fig-height: 3
-#| fig-width: 9
-#| warning: false
-m2 <- lm(READ_AVG ~ PAREDINT + BOOKSHOME, data = pisa)
-
-grid2 <- expand_grid(
-  PAREDINT  = seq(3, 16, length.out = 50),
-  BOOKSHOME = books_levels
-) |>
-  mutate(READ_AVG = predict(m2, newdata = pick(everything())))
-
 pisa |>
-  filter(!is.na(BOOKSHOME)) |>
-  ggplot(aes(x = PAREDINT, y = READ_AVG, colour = factor(BOOKSHOME, levels = books_levels))) +
-  geom_jitter(width = 0.45, alpha = 0.10) +
-  geom_line(data = grid2, aes(group = factor(BOOKSHOME, levels = books_levels)), linewidth = 1.2) +
-  scale_colour_viridis_d(end = 0.9) +
-  labs(x = "Parent education (years)", y = "Reading score",
-       colour = "Books at home")
+  select(Reading = READ_AVG, `Parent ed` = PAREDINT, Books = BOOKSHOME) |>
+  cor(use = "pairwise.complete.obs") |>
+  round(2) |>
+  knitr::kable()
 ```
+
+
+
+## Multiple Regression 2
 
 ```{r}
 #| echo: false
+m2 <- lm(READ_AVG ~ PAREDINT_c + BOOKSHOME_c, data = pisa)
+
 coef_table(m2)
 ```
 
-$R^2$ = `r fmt(summary(m2)$r.squared, 3)` (was `r fmt(summary(m1)$r.squared, 3)` with parent education alone)
-
-How do you interpret this?
+`r model_fit(m2)`
 
 ::: {.content-visible when-profile="teacher"}
 ::: {.fragment}
 Target answer: how parent education predicts reading outcome controlling for
 books at home, and vice versa. The lines are parallel because each predictor
 gets one slope that holds at every level of the other.
-:::
-:::
 
-::: {.content-visible when-profile="teacher"}
-::: {.notes}
-The parent-education slope drops from `r fmt(coef(m1)[["PAREDINT"]], 2)` to
-`r fmt(coef(m2)[["PAREDINT"]], 2)` once books at home is in the model. Much of
+The parent-education slope drops from `r fmt(coef(m1)[["PAREDINT_c"]], 2)` to
+`r fmt(coef(m2)[["PAREDINT_c"]], 2)` once books at home is in the model. Much of
 what looked like a parent-education effect was shared with books at home. This
 is the setup for the mediation problem at the end.
+
+Both predictors are mean-centred, so the intercept
+(`r fmt(coef(m2)[["(Intercept)"]], 1)`) is the predicted reading score for a
+student at average parent education and average books at home. Note the books
+mean is `r fmt(books_mean, 2)`, which is not one of the response options --
+worth saying out loud if a student asks.
 
 Original plan: Show a regression of pisa reading outcome ~ PAREDINT +
 BOOKSHOME. Show a plot and also output. Ask students to interpret. Target
@@ -330,22 +349,30 @@ formatting.
 :::
 :::
 
-## Interaction in Multiple Regression
+## Interaction in Multiple Regression 1
 
 $$\hat{y} = b_0 + b_1 x_1 + b_2 x_2 + b_3 (x_1 \times x_2)$$
+
+## Interaction in Multiple Regression 2
 
 ```{r}
 #| echo: false
 #| fig-height: 3
 #| fig-width: 9
 #| warning: false
-m3 <- lm(READ_AVG ~ PAREDINT * BOOKSHOME, data = pisa)
+m3 <- lm(READ_AVG ~ PAREDINT_c * BOOKSHOME_c, data = pisa)
 
+# Build the grid on the raw scales so the axes stay readable, then centre
+# to match the model before predicting.
 grid3 <- expand_grid(
   PAREDINT  = seq(3, 16, length.out = 50),
   BOOKSHOME = books_levels
 ) |>
-  mutate(READ_AVG = predict(m3, newdata = pick(everything())))
+  mutate(
+    PAREDINT_c  = PAREDINT - pared_mean,
+    BOOKSHOME_c = BOOKSHOME - books_mean,
+    READ_AVG    = predict(m3, newdata = pick(everything()))
+  )
 
 pisa |>
   filter(!is.na(BOOKSHOME)) |>
@@ -362,9 +389,7 @@ pisa |>
 coef_table(m3)
 ```
 
-$R^2$ = `r fmt(summary(m3)$r.squared, 3)`
-
-How do you interpret this? Are the main effects more or less important than the interaction effect?
+`r model_fit(m3)`
 
 ::: {.content-visible when-profile="teacher"}
 ::: {.fragment}
@@ -372,31 +397,28 @@ Target answer: how parent education predicts reading controlling for books at
 home and vice versa, AND how the two together predict reading. The lines are
 no longer parallel: the parent-education slope depends on how many books are
 in the home.
-:::
-:::
 
-::: {.content-visible when-profile="teacher"}
-::: {.fragment}
 Here the main effects do the work. Adding the interaction moves $R^2$ from
 `r fmt(summary(m2)$r.squared, 3)` to `r fmt(summary(m3)$r.squared, 3)` and the
-interaction term is not significant (p = `r fmt(summary(m3)$coefficients["PAREDINT:BOOKSHOME", 4], 3)`).
-:::
-:::
+interaction term is not significant (p = `r fmt(summary(m3)$coefficients["PAREDINT_c:BOOKSHOME_c", 4], 3)`).
 
-::: {.content-visible when-profile="teacher"}
-::: {.fragment}
+Predictors are mean-centred here, so the main effects read as average slopes
+rather than slopes at "the other predictor = 0". Centring changes only the
+interpretation, never the fit.
+
 Key point: an interaction says the two predictors act *jointly* on reading.
 That is a different claim from a SEM-style model where parent education
 predicts books at home, and books at home predicts reading.
-:::
-:::
 
-::: {.content-visible when-profile="teacher"}
-::: {.notes}
-The main-effect coefficients look wild here (parent education goes slightly
-negative) because with an interaction in the model they are conditional on the
-other predictor being 0, which is outside the data range. If asked: centering
-fixes the interpretation, not the fit.
+Where this is heading: none of these models cleanly separates parent education
+from books at home. The two correlate
+`r fmt(cor(pisa$PAREDINT, pisa$BOOKSHOME, use = "pairwise.complete.obs"), 2)`,
+so adding books cuts the parent-education slope from
+`r fmt(coef(m1)[["PAREDINT_c"]], 2)` to `r fmt(coef(m2)[["PAREDINT_c"]], 2)`.
+Multiple regression assigns that shared variance to one predictor or the
+other, but it cannot tell us the two are related, or in which direction. The
+interaction does not rescue this: it tests whether the slopes differ, not how
+the predictors are linked. That gap is what SEM and mediation are for.
 
 Original plan: Show a regression of pisa reading outcome ~ PAREDINT + BOOKSHOME
 + PAREDINT x BOOKSHOME. Ask students to interpret. Target answer: how PAREDINT
@@ -411,7 +433,7 @@ equation y = b0 + b1x1 + B1x1*b2x2 in nice latex formatting.
 
 ## Problem
 
-- We know there's a relationship between parent education & books in the home. We know that together they predict reading score. 
+- No relationship between parent education & books? Does that seem right? 
 - It is possible that parent education is one cause of the number of books in the home
   - This is a mediation effect 
 
@@ -436,3 +458,15 @@ Original plan: show the two equations for this. ^ cannot be captured by
 regression, multiple regression or interaction effects.
 :::
 :::
+
+
+## Solving for Systems of Equqtions
+
+Algebraic approach. 
+
+
+## Up Next
+
+Measured Variable Path Analysis Specification
+
+Prep: read the article

@@ -19,7 +19,11 @@
       "Bash(quarto list *)",
       "Bash(awk 'NR==1{print; print \"NFIELDS:\" gsub\\(/,/,\",\"\\)+1}' FS=, pisa22_USA_cln_w1.csv)",
       "Bash(awk 'NR==2' pisa22_USA_cln_w1.csv)",
-      "Bash(Rscript -e 'd <- read.csv\\(\"pisa22_USA_cln_w1.csv\"\\); str\\(d\\); summary\\(d\\); print\\(table\\(d$BOOKSHOME, useNA=\"ifany\"\\)\\); print\\(table\\(d$PAREDINT, useNA=\"ifany\"\\)\\); print\\(colSums\\(is.na\\(d\\)\\)\\)' 2>&1 | head -60)"
+      "Bash(Rscript -e 'd <- read.csv\\(\"pisa22_USA_cln_w1.csv\"\\); str\\(d\\); summary\\(d\\); print\\(table\\(d$BOOKSHOME, useNA=\"ifany\"\\)\\); print\\(table\\(d$PAREDINT, useNA=\"ifany\"\\)\\); print\\(colSums\\(is.na\\(d\\)\\)\\)' 2>&1 | head -60)",
+      "Read(//home/rstudio/**)",
+      "Read(//home/rstudio/.vscode-R/**)",
+      "Read(//usr/local/lib/R/etc/**)",
+      "Bash(Rscript *)"
     ]
   }
 }
