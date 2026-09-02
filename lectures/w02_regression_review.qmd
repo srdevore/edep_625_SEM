@@ -551,14 +551,21 @@ to be solved for. Show how we solve for each.
 :::
 
 ## Solving Systems of Equations 2
-Problem: We can't algebraically solve all problems. More on that when we talk about model identification.
 
-Solution: Maximum likelihood. The maximum likelihood that the observed (model-predicted outputs) match the real data. We maximize the likelihood by iteratively changing the model parameters. Leave as a placeholder. I have slides in which we covered this. 
+Problem: We can't algebraically solve all problems.
+
+Solution: Maximum likelihood. 
+
+Find the $\beta$ values & other parameters that **maximize** the **likelihood** of the observed data.
+
+Given a candidate set of parameters, how likely is it that I'd see exactly this pattern of real values?
+
+
+We maximize the likelihood by guessing & iteratively changing the model parameters 
 
 
 # Maximum Likelihood Estimation (MLE)
 
-Find the $\beta$ values that **maximize** the **likelihood** of predicting the correct outcome.
 
 ## Maximum Likelihood Estimation (MLE)
 
