@@ -9,7 +9,6 @@ format:
     embed-resources: true
     self-contained-math: true
 release: week 2
-draft: true
 ---
 
 ## Agenda
@@ -17,12 +16,14 @@ draft: true
 1. Methods walk through expectations & sign up
 2. Updates: lecture updated, office hrs updated
 3. Variance, covariance, correlation, regression, multiple regression, and interactions
+4. Systems of Equations
+5. Solving 2 ways
 4. R lab: review 
 5. Homework: Example paper of Measured Variable Path Analysis
 
 ::: {.content-visible when-profile="teacher"}
 ::: {.fragment}
-1: 10 min
+The point of this week is to draw a contrast between models you've studied in the past and SEM. Understand the key thing that distinguishes SEM from regression. 
 :::
 :::
 
@@ -460,9 +461,19 @@ regression, multiple regression or interaction effects.
 :::
 
 
-## Solving for Systems of Equqtions
+## Solving Systems of Equqtions
 
-Algebraic approach. 
+Algebraic approach. Demonstrate how to solve this simple example above (parent education predicts books in home; books in home predicts reading scores). Break over slides to do it step x step. Show the parameters to be solved for. Show how we solve for each. 
+
+Problem: We can't algebraically solve all problems. More on that when we talk about model identification.
+
+Solution: Maximum likelihood. The maximum likelihood that the observed (model-predicted outputs) match the real data. We maximize the likelihood by iteratively changing the model parameters. Leave as a placeholder. I have slides in which we covered this. 
+
+
+R Lab
+Focus on interpretation of the regression models. We will compare this to SEM results next week. 
+
+
 
 
 ## Up Next

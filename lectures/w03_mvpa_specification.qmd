@@ -1,0 +1,19 @@
+---
+title: "Week 3: MVPA: Specification"
+date: today
+description: '<a href="lectures/w03_mvpa_specification.pdf" download="w03_mvpa_specification.pdf">Download PDF</a>'
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    embed-resources: true
+    self-contained-math: true
+release: week 2
+---
+
+
+# Agenda
+
+Degrees of freedom
+exogenous, endogenous
+disruption vs error
