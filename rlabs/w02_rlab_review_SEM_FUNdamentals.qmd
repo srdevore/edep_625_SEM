@@ -10,14 +10,12 @@ draft: true
 
 ## Purpose
 
-In lecture we ran three familiar models predicting reading score: a simple
-regression, a multiple regression, and a multiple regression with an
-interaction. In this lab you'll run those same three models yourself and
-practice reading and interpreting the output. Then we'll specify the same
-variables as a very simple SEM path model in `lavaan` and see what changes.
+Goal: Run & Interpret the regression models below. 
 
-The outcome is always reading score (`READ_AVG`). The predictors available are
-parent education (`PAREDINT`) and books at home (`BOOKSHOME`).
+Purpose: 
+
+* Quick refresher on foundational concepts in regression
+* Compare/contrast these results to the results of an SEM model of the same data in future weeks. 
 
 ## Setup
 
@@ -30,20 +28,6 @@ library(lavaanPlot)
 pisa <- read_csv("w01_data_pisa22_USA_cln.csv", show_col_types = FALSE)
 ```
 
-Quick reminder of the variables (see the Week 1 lab for more detail):
-
-| Variable | What it is |
-|---|---|
-| `PAREDINT` | Highest parental education in years of schooling |
-| `BOOKSHOME` | Books in the home, an ordered 1-5 Likert-style response |
-| `READ_AVG` | Reading literacy score |
-
-Neither predictor has a real 0 in this data (no student has 0 years of
-parental education), so an intercept from the raw variables would describe a
-student who doesn't exist. We'll mean-center both predictors so the intercept
-describes a student at the *average* level of each -- a point that's actually
-in the data. Centering only shifts the intercept; it does not change the
-slopes, $R^2$, or significance tests.
 
 ```{r}
 pared_mean  <- mean(pisa$PAREDINT, na.rm = TRUE)
@@ -95,6 +79,13 @@ student at *average* parental education, not for a (nonexistent) student with
 0 years of schooling. The slope is unchanged by centering -- only the
 intercept's meaning changes.
 :::
+
+## Model 1.a Simple regression 2
+
+```{r}
+m1 <- lm(READ_AVG ~ BOOKSHOME_c, data = pisa)
+summary(m1)
+```
 
 ## Model 2: Multiple regression
 

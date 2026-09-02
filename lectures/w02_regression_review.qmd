@@ -18,10 +18,9 @@ draft: true
 2. Logistics Updates
 3. Data discussion
 4. Variance, covariance, correlation, regression, multiple regression, and interactions
-5. R lab: Interpreting the models 
-5. Systems of Equations
-6. Solving 2 ways
-8. Homework: Example paper of Measured Variable Path Analysis
+5. R lab 
+6. Systems of Equations
+7. Homework: Example paper of Measured Variable Path Analysis
 
 ::: {.content-visible when-profile="teacher"}
 ::: {.fragment}
@@ -198,7 +197,7 @@ standarized. Units of ??
 :::
 :::
 
-## Correlation $$r = \frac{\mathrm{cov}(x, y)}{s_x \, s_y}$$
+## Correlation 
 
 :::: {.columns}
 
@@ -239,7 +238,6 @@ Correlation = **`r fmt(cor(pisa$READ_AVG, pisa$PAREDINT, use = "pairwise.complet
 :::
 
 ::::
-
 $$r = \frac{\mathrm{cov}(x, y)}{s_x \, s_y}$$
 
 
@@ -259,6 +257,17 @@ difference between the two. Target answer: correlation is standardized, ranges
 between -1 and 1. easier to interpret.
 :::
 :::
+
+## Correlation p2
+
+```{r}
+#| echo: false
+pisa |>
+  select(Reading = READ_AVG, `Parent ed` = PAREDINT, Books = BOOKSHOME) |>
+  cor(use = "pairwise.complete.obs") |>
+  round(2) |>
+  knitr::kable()
+```
 
 ## Regression
 
@@ -328,23 +337,11 @@ $$\hat{y} = b_0 + b_1 x_1 + b_2 x_2$$
 
 ```{r}
 #| echo: false
-pisa |>
-  select(Reading = READ_AVG, `Parent ed` = PAREDINT, Books = BOOKSHOME) |>
-  cor(use = "pairwise.complete.obs") |>
-  round(2) |>
-  knitr::kable()
-```
-
-
-
-## Multiple Regression 2
-
-```{r}
-#| echo: false
 m2 <- lm(READ_AVG ~ PAREDINT_c + BOOKSHOME_c, data = pisa)
 
 coef_table(m2)
 ```
+
 
 `r model_fit(m2)`
 
@@ -386,30 +383,6 @@ $$\hat{y} = b_0 + b_1 x_1 + b_2 x_2 + b_3 (x_1 \times x_2)$$
 #| warning: false
 m3 <- lm(READ_AVG ~ PAREDINT_c * BOOKSHOME_c, data = pisa)
 
-# Build the grid on the raw scales so the axes stay readable, then centre
-# to match the model before predicting.
-grid3 <- expand_grid(
-  PAREDINT  = seq(3, 16, length.out = 50),
-  BOOKSHOME = books_levels
-) |>
-  mutate(
-    PAREDINT_c  = PAREDINT - pared_mean,
-    BOOKSHOME_c = BOOKSHOME - books_mean,
-    READ_AVG    = predict(m3, newdata = pick(everything()))
-  )
-
-pisa |>
-  filter(!is.na(BOOKSHOME)) |>
-  ggplot(aes(x = PAREDINT, y = READ_AVG, colour = factor(BOOKSHOME, levels = books_levels))) +
-  geom_jitter(width = 0.45, alpha = 0.10) +
-  geom_line(data = grid3, aes(group = factor(BOOKSHOME, levels = books_levels)), linewidth = 1.2) +
-  scale_colour_viridis_d(end = 0.9) +
-  labs(x = "Parent education (years)", y = "Reading score",
-       colour = "Books at home")
-```
-
-```{r}
-#| echo: false
 coef_table(m3)
 ```
 
@@ -457,15 +430,17 @@ equation y = b0 + b1x1 + B1x1*b2x2 in nice latex formatting.
 
 ## Problem
 
-- No relationship between parent education & books? Does that seem right? 
-- It is possible that parent education is one cause of the number of books in the home
-  - This is a mediation effect 
+- There is a correlation between books at home & parent education (r = 0.27)
+- What is the real-world relationship between them? 
 
+## Mediation Effect
+
+- parent education > more books in home > reading score 
 $$\widehat{\text{Books}} = a_0 + a_1 (\text{ParentEd})$$
-
 $$\widehat{\text{Reading}} = b_0 + b_1 (\text{Books}) + b_2 (\text{ParentEd})$$
 
-Books at home is an *outcome* in the first equation and a *predictor* in the second. That cannot be captured by regression, multiple regression, or interaction effects.
+- Books at home is an *outcome* of parental education in the first equation and a *predictor* of reading score in the second. 
+- Cannot be captured by regression, multiple regression, or interaction effects.
 
 ::: {.content-visible when-profile="teacher"}
 ::: {.fragment}
@@ -485,23 +460,245 @@ regression, multiple regression or interaction effects.
 
 ## Rlab 2
 
-
 - Write a short interpretation of each of the models. 
 - Compare the models: Which is the best? Why?  
 - Save somewhere you can easily find it again. We will come back to this in future weeks. 
 
 
-## Solving Systems of Equqtions
+## Solving Systems of Equqtions 1
 
-Algebraic approach. Demonstrate how to solve this simple example above (parent education predicts books in home; books in home predicts reading scores). Break over slides to do it step x step. Show the parameters to be solved for. Show how we solve for each. 
+```{r}
+#| include: false
+cov_pb <- cov(pisa$PAREDINT, pisa$BOOKSHOME, use = "pairwise.complete.obs")
+var_p  <- var(pisa$PAREDINT, na.rm = TRUE)
+a1 <- cov_pb / var_p
+a0 <- books_mean - a1 * pared_mean
 
+cov_br <- cov(pisa$BOOKSHOME, pisa$READ_AVG, use = "pairwise.complete.obs")
+var_b  <- var(pisa$BOOKSHOME, na.rm = TRUE)
+b1 <- cov_br / var_b
+b0 <- read_mean - b1 * books_mean
+```
+
+Same two equations from the mediation problem, kept as simple as possible:
+
+$$\widehat{\text{Books}} = a_0 + a_1(\text{ParentEd})$$
+$$\widehat{\text{Reading}} = b_0 + b_1(\text{Books})$$
+
+Four unknowns to solve for: $a_0$, $a_1$, $b_0$, $b_1$.
+
+::: {.content-visible when-profile="teacher"}
+::: {.fragment}
+Books depends only on ParentEd. Reading depends only on Books. Nothing feeds
+back into anything earlier. Because the system is *recursive* rather than
+*simultaneous*, we can solve one equation at a time, in order, instead of
+solving for all four unknowns at once.
+:::
+:::
+
+## Solving for $a_1$ and $a_0$
+
+Same trick as the first regression slide: the slope is the covariance
+rescaled by the predictor's variance.
+
+$$a_1 = \frac{\mathrm{cov}(\text{ParentEd}, \text{Books})}{s^2_{\text{ParentEd}}}
+= \frac{`r fmt(cov_pb, 3)`}{`r fmt(var_p, 2)`} = `r fmt(a1, 3)`$$
+
+::: {.fragment}
+The line has to pass through the means, so once $a_1$ is known, $a_0$ falls
+out:
+
+$$a_0 = \overline{\text{Books}} - a_1 \times \overline{\text{ParentEd}}
+= `r fmt(books_mean, 2)` - `r fmt(a1, 3)` \times `r fmt(pared_mean, 2)`
+= `r fmt(a0, 2)`$$
+:::
+
+## Solving for $b_1$ and $b_0$
+
+Same two steps again, one predictor later in the chain:
+
+$$b_1 = \frac{\mathrm{cov}(\text{Books}, \text{Reading})}{s^2_{\text{Books}}}
+= \frac{`r fmt(cov_br, 2)`}{`r fmt(var_b, 3)`} = `r fmt(b1, 2)`$$
+
+::: {.fragment}
+$$b_0 = \overline{\text{Reading}} - b_1 \times \overline{\text{Books}}
+= `r fmt(read_mean, 1)` - `r fmt(b1, 2)` \times `r fmt(books_mean, 2)`
+= `r fmt(b0, 1)`$$
+:::
+
+## The Solved System
+
+$$\widehat{\text{Books}} = `r fmt(a0, 2)` + `r fmt(a1, 3)`(\text{ParentEd})$$
+$$\widehat{\text{Reading}} = `r fmt(b0, 1)` + `r fmt(b1, 2)`(\text{Books})$$
+
+::: {.content-visible when-profile="teacher"}
+::: {.fragment}
+Two equations, solved one at a time, using nothing beyond the
+covariance/variance formula from the first regression slide. This only
+worked because the system is recursive. The moment a model has feedback, or
+latent variables with multiple indicators, this substitution trick stops
+being enough -- that's next.
+:::
+:::
+
+::: {.content-visible when-profile="teacher"}
+::: {.notes}
+Original plan: Algebraic approach. Demonstrate how to solve this simple
+example of parent education predicts books in home; books in home predicts
+reading scores. Break over slides to do it step x step. Show the parameters
+to be solved for. Show how we solve for each.
+:::
+:::
+
+## Solving Systems of Equations 2
 Problem: We can't algebraically solve all problems. More on that when we talk about model identification.
 
 Solution: Maximum likelihood. The maximum likelihood that the observed (model-predicted outputs) match the real data. We maximize the likelihood by iteratively changing the model parameters. Leave as a placeholder. I have slides in which we covered this. 
 
 
-R Lab
-Focus on interpretation of the regression models. We will compare this to SEM results next week. 
+# Maximum Likelihood Estimation (MLE)
+
+Find the $\beta$ values that **maximize** the **likelihood** of predicting the correct outcome.
+
+## Maximum Likelihood Estimation (MLE)
+
+- Initialize all $\beta$ weights based on OLS estimates
+
+::: notes
+Maximum likelihood: find parameters that make observed data most probable
+
+Start with no information ()
+
+Iteratively adjust weights to improve fit
+:::
+
+## Maximum Likelihood: Continued
+
+After we make our first predictions
+- check the actual data
+- use log likelihood to see how likely our model results are given the actual data.
+
+$$\log L(\beta) = \sum_{i=1}^{n} [Y_i \log(p_i) + (1-Y_i) \log(1-p_i)]$$
+
+Where:
+
+- $Y_i$ = actual outcome (0, 1)
+- $p_i$ = model-predicted probability of being 1 (0-1)
+
+::: notes
+p = 1 zeros out
+- 0 points are added for cases where the correct outcome & prediction align (i.e. 0 points for y = 1, p = 1 and y = 0, p = 0).
+- The further the disparity, the more points are subtracted.
+- So 0 is actually the best outcome. the more strongly negative, the worse.
+:::
+
+# Gradient Ascent: Finding the Peak
+
+```{r gradient-ascent-plot, echo=FALSE, fig.width=10, fig.height=6}
+# Create visualization of gradient ascent
+beta_vals <- seq(-3, 3, by = 0.05)
+# Simulate a log-likelihood curve (inverted parabola)
+log_lik_vals <- -(beta_vals - 1)^2 + 5
+
+gradient_df <- data.frame(
+  beta = beta_vals,
+  log_likelihood = log_lik_vals
+)
+
+# Points showing gradient ascent steps
+ascent_points <- data.frame(
+  step = 0:5,
+  beta = c(-2, -1, 0, 0.5, 0.8, 1),
+  log_lik = c(-((-2) - 1)^2 + 5, -((-1) - 1)^2 + 5, -((0) - 1)^2 + 5,
+              -((0.5) - 1)^2 + 5, -((0.8) - 1)^2 + 5, -((1) - 1)^2 + 5)
+)
+
+ggplot(gradient_df, aes(x = beta, y = log_likelihood)) +
+  geom_line(size = 1.5, color = "steelblue") +
+  geom_point(data = ascent_points, aes(x = beta, y = log_lik),
+             color = "red", size = 4) +
+  geom_path(data = ascent_points, aes(x = beta, y = log_lik),
+            color = "red", size = 1, arrow = arrow(length = unit(0.3, "cm"))) +
+  geom_vline(xintercept = 1, linetype = "dashed", color = "darkgreen", size = 1) +
+  annotate("text", x = 1, y = 6, label = "Optimal β",
+           color = "darkgreen", size = 5, fontface = "bold") +
+  annotate("text", x = -2, y = 0, label = "Start: β = -2",
+           color = "red", size = 4) +
+  annotate("text", x = ascent_points$beta[6] + 0.5, y = ascent_points$log_lik[6],
+           label = "Converged!", color = "red", size = 4) +
+  labs(
+    title = "Gradient Ascent: Climbing to Maximum Log Likelihood",
+    subtitle = "Iteratively adjust β weights to find the peak",
+    x = "β (Weight)",
+    y = "Log Likelihood"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5, size = 16),
+    plot.subtitle = element_text(hjust = 0.5)
+  )
+```
+
+::: notes
+
+Start at arbitrary point
+Calculate slope (gradient) at current position
+Move in direction of steepest ascent
+Repeat until we reach the peak
+
+**At any point on the curve:**
+
+Calculate the derivative (gradient) = slope at that point
+
+$$\frac{\partial(\log L)}{\partial \beta_j} = \sum_{i=1}^{n} (Y_i - p_i) \times x_{ji}$$
+
+**What this means:**
+
+- $Y_i$ = Actual outcome for student i (0 or 1)
+- $p_i$ = Predicted probability for student i
+- $x_{ji}$ = Value of predictor j for student i
+- $(Y_i - p_i)$ = Prediction error
+
+**Interpretation:**
+
+- Positive gradient → increase $\beta_j$ to improve fit
+- Negative gradient → decrease $\beta_j$ to improve fit
+- Gradient near 0 → we're at the peak!
+
+Gradient tells us which direction to move
+Error times predictor value
+When gradient = 0, we've found optimal weights
+:::
+
+# Updating Weights: The Learning Process
+
+**Update Rule:**
+
+$$\beta_j^{\text{(new)}} = \beta_j^{\text{(old)}} + \text{learning rate} \times \text{gradient}$$
+
+Why the learning rate?
+
+- Gradient tells us the direction & steepness of the curve
+- Learning rate controls how far we move (not a full unit of the beta weight - a much smaller increment)
+- Too large → might overshoot the peak
+- Too small → takes forever to converge
+
+# Gradient Ascent
+
+Iterative Process:
+
+1. Calculate gradients for all $\beta$ weights
+2. Update all weights simultaneously
+3. Repeat until gradients ≈ 0 (convergence)
+
+::: notes
+
+- Learning rate is crucial hyperparameter
+- Small steps ensure we don't miss the peak
+- Typical stopping criterion: change in log likelihood < 0.0001
+- Usually converges in 10-100 iterations
+:::
+
 
 
 
