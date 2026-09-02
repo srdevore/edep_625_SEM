@@ -1,0 +1,795 @@
+---
+title: "Week 2: Review & SEM FUNdamentals"
+date: today
+description: '<a href="lectures/w02_regression_review.pdf" download="w02_regression_review.pdf">Download PDF</a>'
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    embed-resources: true
+    self-contained-math: true
+release: week 2
+draft: true
+---
+
+## Agenda
+
+1. Methods walk through expectations & sign up
+2. Logistics Updates
+3. Data discussion
+4. Variance, covariance, correlation, regression, multiple regression, and interactions
+5. R lab 
+6. Systems of Equations
+7. Homework: Example paper of Measured Variable Path Analysis
+
+::: {.content-visible when-profile="teacher"}
+::: {.fragment}
+The point of this week is to draw a contrast between models you've studied in the past and SEM. Understand the key thing that distinguishes SEM from regression. 
+
+:::
+:::
+
+
+```{r}
+#| include: false
+library(tidyverse)
+
+pisa <- read_csv("../rlabs/w01_data_pisa22_USA_cln.csv", show_col_types = FALSE)
+
+theme_set(theme_minimal(base_size = 16))
+
+# BOOKSHOME is coded 1, 2, 3, 4, 6, 7 in this extract -- there is no 5.
+# Derive the levels from the data so plots never invent a category.
+books_levels <- sort(unique(na.omit(pisa$BOOKSHOME)))
+
+# Mean-centred versions for the interaction model. Books at home starts at 1
+# and parent education at 3, so in an uncentred interaction the main effects
+# are slopes at "the other predictor = 0" -- a point off both scales, which
+# flips the parent-education coefficient negative for purely arithmetic
+# reasons. Centring moves that reference point to the mean, so the main
+# effects read as average slopes. The fit is untouched.
+pared_mean <- mean(pisa$PAREDINT, na.rm = TRUE)
+books_mean <- mean(pisa$BOOKSHOME, na.rm = TRUE)
+
+pisa <- pisa |>
+  mutate(
+    PAREDINT_c  = PAREDINT - pared_mean,
+    BOOKSHOME_c = BOOKSHOME - books_mean
+  )
+
+fmt <- function(x, d = 2) formatC(x, format = "f", digits = d, big.mark = ",")
+
+coef_table <- function(model) {
+  broom::tidy(model) |>
+    mutate(
+      term = recode(term,
+        "(Intercept)"            = "Intercept",
+        "PAREDINT"               = "Parent education",
+        "BOOKSHOME"              = "Books at home",
+        "PAREDINT:BOOKSHOME"     = "Parent education x Books",
+        "PAREDINT_c"             = "Parent education",
+        "BOOKSHOME_c"            = "Books at home",
+        "PAREDINT_c:BOOKSHOME_c" = "Parent education x Books"
+      ),
+      across(c(estimate, std.error, statistic), ~ round(.x, 2)),
+      p.value = ifelse(p.value < .001, "< .001", fmt(p.value, 3))
+    ) |>
+    rename(Term = term, Estimate = estimate, SE = std.error,
+           t = statistic, p = p.value) |>
+    knitr::kable()
+}
+
+# Overall model test. The coefficient table gives one t-test per predictor;
+# this is the omnibus F comparing the whole model against an intercept-only
+# model, so students see model-level and coefficient-level significance
+# together.
+model_fit <- function(model) {
+  s <- summary(model)
+  f <- s$fstatistic
+  p <- pf(f[["value"]], f[["numdf"]], f[["dendf"]], lower.tail = FALSE)
+  sprintf(
+    "$R^2$ = %s, adj. $R^2$ = %s, $F$(%d, %s) = %s, $p$ %s, residual SE = %s",
+    fmt(s$r.squared, 3),
+    fmt(s$adj.r.squared, 3),
+    as.integer(f[["numdf"]]),
+    formatC(f[["dendf"]], format = "d", big.mark = ","),
+    fmt(f[["value"]], 1),
+    if (p < .001) "< .001" else paste("=", fmt(p, 3)),
+    fmt(sigma(model), 1)
+  )
+}
+```
+
+## Updates
+
+1. Downloadable deck for w01 updated
+2. AI Fair Use for class added to syllabus
+  - living doc - open to future discussion
+3. Office hours: Changed to Mon 2:30-3:30 or by apt. Sign up link added
+
+## Data Discussions
+
+- < 1 min overview of the datasets you found 
+- What questions can you answer with them
+- Share with the class
+
+
+## Methods walk through
+
+Assignment: Lamaku > Assignments > methods walkthrough
+
+Template: Course website: https://srdevore.github.io/edep_625_sem/
+
+## Variance
+
+```{r}
+#| echo: false
+#| fig-height: 3.2
+#| fig-width: 9
+set.seed(625)
+samp <- pisa |>
+  filter(!is.na(READ_AVG)) |>
+  slice_sample(n = 60) |>
+  mutate(case = row_number())
+
+read_mean <- mean(pisa$READ_AVG, na.rm = TRUE)
+
+ggplot(samp, aes(x = case, y = READ_AVG)) +
+  geom_segment(aes(xend = case, yend = read_mean),
+               colour = "grey65", linewidth = 0.4) +
+  geom_point(size = 2.4, alpha = 0.8, colour = "grey20") +
+  geom_hline(yintercept = read_mean, colour = "magenta", linewidth = 1.2) +
+  annotate("text", x = 0, y = read_mean,
+           label = paste0("mean = ", fmt(read_mean, 1)),
+           colour = "magenta", hjust = 0, vjust = -0.6, size = 5) +
+  labs(x = "Student", y = "Reading score")
+```
+
+$$s^2 = \frac{\sum_{i=1}^{n}(y_i - \bar{y})^2}{n - 1}$$
+
+$s^2$ = `r fmt(var(pisa$READ_AVG, na.rm = TRUE), 1)` 
+$s$ = `r fmt(sd(pisa$READ_AVG, na.rm = TRUE), 1)`
+
+::: {.content-visible when-profile="teacher"}
+::: {.fragment}
+Target answer: a measure of how scattered the data is around the mean. This is what we want to explain. WHY are students getting different scores. Causally: what causes differences in student scores. 
+
+The grey segments are the deviations that get squared in the formula. Squaring
+is why the variance (11,296) is on an uninterpretable scale while the SD (106)
+is back in reading-score points.
+
+Original plan: Students should know this well. Show a scatterplot of the pisa
+reading out come with a mean bar and cases on the bottom (do a random selection
+that visualizes nicely) and ask them to describe what variance is. Target
+answer: measure of how scattered data is around the mean.
+:::
+:::
+
+## Covariance
+
+```{r}
+#| echo: false
+#| fig-height: 3.4
+#| fig-width: 9
+#| warning: false
+ggplot(pisa, aes(x = PAREDINT, y = READ_AVG)) +
+  geom_jitter(width = 0.45, alpha = 0.12) +
+  geom_smooth(method = "lm", se = FALSE, colour = "magenta", linewidth = 1.2) +
+  labs(x = "Parent education (years)", y = "Reading score")
+```
+
+$$\mathrm{cov}(x, y) = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{n - 1}$$
+
+cov = `r fmt(cov(pisa$READ_AVG, pisa$PAREDINT, use = "pairwise.complete.obs"), 2)`
+
+
+::: {.content-visible when-profile="teacher"}
+::: {.fragment}
+Target answer: how two variables change in relation to each other. Not
+standardized. Units are reading-score points x years of schooling, which is
+why the number itself is hard to interpret.
+
+
+Original plan: Also old hat to students. Show pisa reading outcome x PAREDINT
+and ask them to describe what covariance is. Show the line & covariance number.
+Target answer: how two variables change in relation to eachother. Not
+standarized. Units of ??
+:::
+:::
+
+## Correlation 
+
+:::: {.columns}
+
+::: {.column width="50%"}
+Covariance
+
+```{r}
+#| echo: false
+#| fig-height: 3.6
+#| fig-width: 4.5
+#| warning: false
+ggplot(pisa, aes(x = PAREDINT, y = READ_AVG)) +
+  geom_jitter(width = 0.45, alpha = 0.12) +
+  geom_smooth(method = "lm", se = FALSE, colour = "magenta") +
+  labs(x = "Parent education (years)", y = "Reading score")
+```
+
+Covariance = **`r fmt(cov(pisa$READ_AVG, pisa$PAREDINT, use = "pairwise.complete.obs"), 2)`**
+:::
+
+::: {.column width="50%"}
+Correlation
+
+```{r}
+#| echo: false
+#| fig-height: 3.6
+#| fig-width: 4.5
+#| warning: false
+pisa |>
+  mutate(z_pared = scale(PAREDINT)[, 1], z_read = scale(READ_AVG)[, 1]) |>
+  ggplot(aes(x = z_pared, y = z_read)) +
+  geom_jitter(width = 0.15, alpha = 0.12) +
+  geom_smooth(method = "lm", se = FALSE, colour = "magenta") +
+  labs(x = "Parent education", y = "Reading score")
+```
+
+Correlation = **`r fmt(cor(pisa$READ_AVG, pisa$PAREDINT, use = "pairwise.complete.obs"), 3)`**
+:::
+
+::::
+$$r = \frac{\mathrm{cov}(x, y)}{s_x \, s_y}$$
+
+
+::: {.content-visible when-profile="teacher"}
+::: {.fragment}
+Target answer: correlation is standardized, so it ranges between -1 and 1 and
+is much easier to interpret. Covariance carries the original units.
+
+The point clouds are identical apart from the axis labels. Dividing by the two
+SDs (`r fmt(sd(pisa$PAREDINT, na.rm = TRUE), 2)` and
+`r fmt(sd(pisa$READ_AVG, na.rm = TRUE), 2)`) is the only difference:
+49.54 / (2.67 x 106.28) = 0.174.
+
+Original plan: Also very well known to students. Show pisa reading outcome x
+PAREDINT correlation and covariance side x side and ask them to describe the
+difference between the two. Target answer: correlation is standardized, ranges
+between -1 and 1. easier to interpret.
+:::
+:::
+
+## Correlation p2
+
+```{r}
+#| echo: false
+pisa |>
+  select(Reading = READ_AVG, `Parent ed` = PAREDINT, Books = BOOKSHOME) |>
+  cor(use = "pairwise.complete.obs") |>
+  round(2) |>
+  knitr::kable()
+```
+
+## Regression
+
+$$\hat{y} = b_0 + b_1 x_1$$
+
+```{r}
+#| echo: false
+#| fig-height: 3
+#| fig-width: 9
+#| warning: false
+m1 <- lm(READ_AVG ~ PAREDINT_c, data = pisa)
+
+# Plotted on the raw scale: centring shifts the intercept, not the line.
+ggplot(pisa, aes(x = PAREDINT, y = READ_AVG)) +
+  geom_jitter(width = 0.45, alpha = 0.12) +
+  geom_smooth(method = "lm", se = TRUE, colour = "magenta", linewidth = 1.2) +
+  labs(x = "Parent education (years)", y = "Reading score")
+```
+
+```{r}
+#| echo: false
+coef_table(m1)
+```
+
+`r model_fit(m1)`
+
+
+::: {.content-visible when-profile="teacher"}
+::: {.fragment}
+Target answer: we are predicting reading outcome from parent education. Each
+additional year of parent education predicts about
+`r fmt(coef(m1)[["PAREDINT_c"]], 2)` more reading-score points. $R^2$ and the
+residual SE are the indicators of how good those predictions are.
+
+Parent education is mean-centred, so the intercept
+(`r fmt(coef(m1)[["(Intercept)"]], 1)`) is the predicted reading score at
+average parent education (`r fmt(pared_mean, 1)` years) rather than at zero
+years, which is off the scale. The slope is unchanged by centring.
+
+The reminder you asked for: the slope is just the covariance rescaled.
+
+$$b_1 = \frac{\mathrm{cov}(x, y)}{s^2_x} = \frac{49.54}{7.11} = 6.97
+\qquad
+r = b_1 \frac{s_x}{s_y} = 6.97 \times \frac{2.67}{106.28} = 0.174$$
+
+Same information as the covariance and the correlation, in prediction units.
+:::
+:::
+
+::: {.content-visible when-profile="teacher"}
+::: {.notes}
+$R^2$ is only 0.03 here, so parent education alone explains 3% of the variance
+in reading. Worth flagging that a real, significant effect can still be a weak
+predictor.
+
+Original plan: show a regression of pisa reading outcome ~ PAREDINT. Show the
+plot and also the output. Ask students to interpret. Target answer: Predicting
+reading outcome from PAREDINT; indicators of how good the predictions are.
+Coefficient the same as correlation/covariance (Remind me). show the structural
+equation y = b0 + b1x1 in nice latex formatting.
+:::
+:::
+
+## Multiple Regression 1
+
+$$\hat{y} = b_0 + b_1 x_1 + b_2 x_2$$
+
+```{r}
+#| echo: false
+m2 <- lm(READ_AVG ~ PAREDINT_c + BOOKSHOME_c, data = pisa)
+
+coef_table(m2)
+```
+
+
+`r model_fit(m2)`
+
+::: {.content-visible when-profile="teacher"}
+::: {.fragment}
+Target answer: how parent education predicts reading outcome controlling for
+books at home, and vice versa. The lines are parallel because each predictor
+gets one slope that holds at every level of the other.
+
+The parent-education slope drops from `r fmt(coef(m1)[["PAREDINT_c"]], 2)` to
+`r fmt(coef(m2)[["PAREDINT_c"]], 2)` once books at home is in the model. Much of
+what looked like a parent-education effect was shared with books at home. This
+is the setup for the mediation problem at the end.
+
+Both predictors are mean-centred, so the intercept
+(`r fmt(coef(m2)[["(Intercept)"]], 1)`) is the predicted reading score for a
+student at average parent education and average books at home. Note the books
+mean is `r fmt(books_mean, 2)`, which is not one of the response options --
+worth saying out loud if a student asks.
+
+Original plan: Show a regression of pisa reading outcome ~ PAREDINT +
+BOOKSHOME. Show a plot and also output. Ask students to interpret. Target
+answer: how PAREDINT predicts reading outcome controlling for BOOKSHOME & vice
+versa. show the structural equation y = b0 + b1x1 + b2x2 in nice latex
+formatting.
+:::
+:::
+
+## Interaction in Multiple Regression 1
+
+$$\hat{y} = b_0 + b_1 x_1 + b_2 x_2 + b_3 (x_1 \times x_2)$$
+
+## Interaction in Multiple Regression 2
+
+```{r}
+#| echo: false
+#| fig-height: 3
+#| fig-width: 9
+#| warning: false
+m3 <- lm(READ_AVG ~ PAREDINT_c * BOOKSHOME_c, data = pisa)
+
+coef_table(m3)
+```
+
+`r model_fit(m3)`
+
+::: {.content-visible when-profile="teacher"}
+::: {.fragment}
+Target answer: how parent education predicts reading controlling for books at
+home and vice versa, AND how the two together predict reading. The lines are
+no longer parallel: the parent-education slope depends on how many books are
+in the home.
+
+Here the main effects do the work. Adding the interaction moves $R^2$ from
+`r fmt(summary(m2)$r.squared, 3)` to `r fmt(summary(m3)$r.squared, 3)` and the
+interaction term is not significant (p = `r fmt(summary(m3)$coefficients["PAREDINT_c:BOOKSHOME_c", 4], 3)`).
+
+Predictors are mean-centred here, so the main effects read as average slopes
+rather than slopes at "the other predictor = 0". Centring changes only the
+interpretation, never the fit.
+
+Key point: an interaction says the two predictors act *jointly* on reading.
+That is a different claim from a SEM-style model where parent education
+predicts books at home, and books at home predicts reading.
+
+Where this is heading: none of these models cleanly separates parent education
+from books at home. The two correlate
+`r fmt(cor(pisa$PAREDINT, pisa$BOOKSHOME, use = "pairwise.complete.obs"), 2)`,
+so adding books cuts the parent-education slope from
+`r fmt(coef(m1)[["PAREDINT_c"]], 2)` to `r fmt(coef(m2)[["PAREDINT_c"]], 2)`.
+Multiple regression assigns that shared variance to one predictor or the
+other, but it cannot tell us the two are related, or in which direction. The
+interaction does not rescue this: it tests whether the slopes differ, not how
+the predictors are linked. That gap is what SEM and mediation are for.
+
+Original plan: Show a regression of pisa reading outcome ~ PAREDINT + BOOKSHOME
++ PAREDINT x BOOKSHOME. Ask students to interpret. Target answer: how PAREDINT
+predicts reading outcome controlling for BOOKSHOME & vice versa AND how PAREDINT
+x BOOKSHOME together predict reading. Are main effects more or less important
+than the interaction effect? A key point is to distinguish this
+combined/interaction effect from SEM approaches where PAREDINT predicts
+BOOKSHOME and BOOKSHOME predicts reading (for example) show the structural
+equation y = b0 + b1x1 + B1x1*b2x2 in nice latex formatting.
+:::
+:::
+
+## Problem
+
+- There is a correlation between books at home & parent education (r = 0.27)
+- What is the real-world relationship between them? 
+
+## Mediation Effect
+
+- parent education > more books in home > reading score 
+
+$$\widehat{\text{Books}} = a_0 + a_1(\text{ParentEd})$$
+$$\widehat{\text{Reading}} = b_0 + b_1(\text{Books})$$
+
+- Books at home is an *outcome* of parental education in the first equation and a *predictor* of reading score in the second. 
+- Cannot be captured by regression, multiple regression, or interaction effects.
+
+::: {.content-visible when-profile="teacher"}
+::: {.fragment}
+A single regression forces every variable to be either a predictor or an
+outcome, never both. Two equations estimated separately also cannot share
+information or test the indirect path. This is what systems of equations, and
+then SEM, are for.
+:::
+:::
+
+::: {.content-visible when-profile="teacher"}
+::: {.notes}
+Original plan: show the two equations for this. ^ cannot be captured by
+regression, multiple regression or interaction effects.
+:::
+:::
+
+## Rlab 2
+
+- Write a short interpretation of each of the models. 
+- Compare the models: Which is the best? Why?  
+- Save somewhere you can easily find it again. We will come back to this in future weeks. 
+
+
+## Solving Systems of Equqtions 1
+
+```{r}
+#| include: false
+cov_pb <- cov(pisa$PAREDINT, pisa$BOOKSHOME, use = "pairwise.complete.obs")
+var_p  <- var(pisa$PAREDINT, na.rm = TRUE)
+a1 <- cov_pb / var_p
+a0 <- books_mean - a1 * pared_mean
+
+cov_br <- cov(pisa$BOOKSHOME, pisa$READ_AVG, use = "pairwise.complete.obs")
+var_b  <- var(pisa$BOOKSHOME, na.rm = TRUE)
+b1 <- cov_br / var_b
+b0 <- read_mean - b1 * books_mean
+```
+
+Two equations, four unknowns
+
+$$\text{Books} = a_0 + a_1(\text{ParentEd}) + d_B$$
+$$\text{Reading} = b_0 + b_1(\text{Books}) + d_R$$
+
+Unknowns: $a_0$, $a_1$, $b_0$, $b_1$.
+
+The SEM idea: set the covariances the model *implies* equal to the covariances
+we actually *observe*, then solve for the parameters.
+
+## First Equation — Step 1: The model
+
+$$\text{Books} = a_0 + a_1(\text{ParentEd}) + d_B$$
+
+$d_B$ is the disturbance (what ParentEd does not explain). In SEM we assume it
+is uncorrelated with the predictor:
+
+$$\mathrm{cov}(\text{ParentEd},\, d_B) = 0$$
+
+## First Equation — Step 2: Covary both sides with ParentEd
+
+Take the covariance of each side with ParentEd:
+
+$$\mathrm{cov}(\text{ParentEd},\, \text{Books})
+= \mathrm{cov}\big(\text{ParentEd},\; a_0 + a_1\text{ParentEd} + d_B\big)$$
+
+## First Equation — Step 3: Distribute the covariance
+
+$$\mathrm{cov}(\text{ParentEd}, \text{Books}) =
+\mathrm{cov}(\text{ParentEd}, a_0)
++ a_1\,\mathrm{cov}(\text{ParentEd}, \text{ParentEd})
++ \mathrm{cov}(\text{ParentEd}, d_B)$$
+
+## First Equation — Step 4: Simplify each term
+
+- $\mathrm{cov}(\text{ParentEd}, a_0) = 0$ &nbsp; (covariance with a constant)
+- $\mathrm{cov}(\text{ParentEd}, \text{ParentEd}) = s^2_{\text{ParentEd}}$
+- $\mathrm{cov}(\text{ParentEd}, d_B) = 0$ &nbsp; (our assumption)
+
+$$\mathrm{cov}(\text{ParentEd}, \text{Books}) = a_1\, s^2_{\text{ParentEd}}$$
+
+## First Equation — Step 5: Solve for $a_1$
+
+Divide both sides by $s^2_{\text{ParentEd}}$:
+
+$$a_1 = \frac{\mathrm{cov}(\text{ParentEd}, \text{Books})}{s^2_{\text{ParentEd}}}$$
+
+## First Equation — Step 6: Plug in the numbers
+
+$$a_1 = \frac{`r fmt(cov_pb, 3)`}{`r fmt(var_p, 2)`} = `r fmt(a1, 3)`$$
+
+## First Equation — Step 7: Back out the intercept $a_0$
+
+The line passes through the means, so:
+
+$$a_0 = \overline{\text{Books}} - a_1 \times \overline{\text{ParentEd}}
+= `r fmt(books_mean, 2)` - `r fmt(a1, 3)` \times `r fmt(pared_mean, 2)`
+= `r fmt(a0, 2)`$$
+
+## Second Equation — Step 1: The model
+
+$$\text{Reading} = b_0 + b_1(\text{Books}) + d_R$$
+
+Same assumption, one link later in the chain:
+
+$$\mathrm{cov}(\text{Books},\, d_R) = 0$$
+
+## Second Equation — Step 2: Covary both sides with Books
+
+$$\mathrm{cov}(\text{Books},\, \text{Reading})
+= \mathrm{cov}\big(\text{Books},\; b_0 + b_1\text{Books} + d_R\big)$$
+
+## Second Equation — Step 3: Distribute the covariance
+
+$$\mathrm{cov}(\text{Books}, \text{Reading}) =
+\mathrm{cov}(\text{Books}, b_0)
++ b_1\,\mathrm{cov}(\text{Books}, \text{Books})
++ \mathrm{cov}(\text{Books}, d_R)$$
+
+## Second Equation — Step 4: Simplify each term
+
+- $\mathrm{cov}(\text{Books}, b_0) = 0$ &nbsp; (covariance with a constant)
+- $\mathrm{cov}(\text{Books}, \text{Books}) = s^2_{\text{Books}}$
+- $\mathrm{cov}(\text{Books}, d_R) = 0$ &nbsp; (our assumption)
+
+$$\mathrm{cov}(\text{Books}, \text{Reading}) = b_1\, s^2_{\text{Books}}$$
+
+## Second Equation — Step 5: Solve for $b_1$
+
+$$b_1 = \frac{\mathrm{cov}(\text{Books}, \text{Reading})}{s^2_{\text{Books}}}$$
+
+## Second Equation — Step 6: Plug in the numbers
+
+$$b_1 = \frac{`r fmt(cov_br, 2)`}{`r fmt(var_b, 3)`} = `r fmt(b1, 2)`$$
+
+## Second Equation — Step 7: Back out the intercept $b_0$
+
+$$b_0 = \overline{\text{Reading}} - b_1 \times \overline{\text{Books}}
+= `r fmt(read_mean, 1)` - `r fmt(b1, 2)` \times `r fmt(books_mean, 2)`
+= `r fmt(b0, 1)`$$
+
+## The Solved System
+
+$$\widehat{\text{Books}} = `r fmt(a0, 2)` + `r fmt(a1, 3)`(\text{ParentEd})$$
+$$\widehat{\text{Reading}} = `r fmt(b0, 1)` + `r fmt(b1, 2)`(\text{Books})$$
+
+- Merely ~14 steps 
+- simplest possible MVPA model
+
+::: {.content-visible when-profile="teacher"}
+::: {.notes}
+Original plan: Algebraic approach. Demonstrate how to solve this simple
+example of parent education predicts books in home; books in home predicts
+reading scores. Break over slides to do it step x step. Show the parameters
+to be solved for. Show how we solve for each.
+:::
+:::
+
+## Solving Systems of Equations: Maximum Likelihood
+
+Objective: 
+
+- Find the $\beta$ values & other parameters that **maximize** the **likelihood** of the observed data.
+- Given a candidate set of parameters, how likely is it that I'd see exactly this pattern of real values? 
+
+## Maximum Likelihood Estimation (MLE)
+
+- Initialize the parameters ($\theta$) with reasonable start values (e.g., from the observed covariances)
+
+::: notes
+Maximum likelihood: find parameters that make the observed data most probable.
+
+NOTE FOR STUDENTS WHO TOOK LOG REG WITH ME: This is a slightly different
+application of ML than what we did with logistic regression. There, we were
+fitting individual 0/1 outcomes with predicted probabilities. In SEM we are
+fitting the observed covariance matrix (S) with a model-implied covariance
+matrix. Same big idea (guess parameters, iteratively improve the fit), but the
+"data" we're trying to reproduce is different.
+
+Start with reasonable guesses, then iteratively adjust the parameters to
+improve fit.
+:::
+
+## Maximum Likelihood: Continued
+
+After we make our first guess at the parameters
+
+- compute the model-implied covariance matrix $\Sigma(\theta)$
+- compare it to the observed covariance matrix $S$
+- use the ML fit function to see how far off the model is from the data.
+  - we want this to be as small as possible
+
+## ML fit function
+
+$$F_{ML} = \log|\Sigma(\theta)| + \text{tr}(S\,\Sigma(\theta)^{-1}) - \log|S| - p$$
+
+Where:
+
+- $S$ = observed covariance matrix (from our data)
+- $\Sigma(\theta)$ = model-implied covariance matrix
+- $\theta$ = parameters
+- $p$ = number of observed variables
+
+::: notes
+NOTE FOR STUDENTS WHO TOOK LOG REG WITH ME: In log reg we maximized a
+log-likelihood built from individual 0/1 outcomes. Here we MINIMIZE a fit
+function built from covariance matrices. It's the same ML logic, just applied
+to reproducing S instead of reproducing individual outcomes.
+
+- $F_{ML}$ is a discrepancy (misfit) between what the model implies and what we
+  actually observed.
+- When $\Sigma(\theta) = S$ (model perfectly reproduces the observed
+  covariances), the fit function equals 0.
+- The further $\Sigma(\theta)$ is from $S$, the larger the value.
+- So 0 is the best outcome, and larger values are worse. (Opposite direction
+  from the log reg log-likelihood, where less-negative was better.)
+:::
+
+## Pause & Recap
+
+Maximum likelihood estimation represents the objective of what we want to do. 
+
+Conceptually, what is our objective? 
+
+## Gradient Descent: Finding the Valley
+
+The search: Iterative optemizer
+
+```{r gradient-descent-plot, echo=FALSE, fig.width=10, fig.height=6}
+# Create visualization of gradient descent (minimizing the fit function)
+theta_vals <- seq(-3, 3, by = 0.05)
+# Simulate a misfit curve (upright parabola) - minimized at theta = 1
+misfit_vals <- (theta_vals - 1)^2
+
+gradient_df <- data.frame(
+  theta = theta_vals,
+  misfit = misfit_vals
+)
+
+# Points showing gradient descent steps
+descent_points <- data.frame(
+  step = 0:5,
+  theta = c(-2, -1, 0, 0.5, 0.8, 1),
+  misfit = c((-2 - 1)^2, (-1 - 1)^2, (0 - 1)^2,
+             (0.5 - 1)^2, (0.8 - 1)^2, (1 - 1)^2)
+)
+
+ggplot(gradient_df, aes(x = theta, y = misfit)) +
+  geom_line(size = 1.5, color = "steelblue") +
+  geom_point(data = descent_points, aes(x = theta, y = misfit),
+             color = "red", size = 4) +
+  geom_path(data = descent_points, aes(x = theta, y = misfit),
+            color = "red", size = 1, arrow = arrow(length = unit(0.3, "cm"))) +
+  geom_vline(xintercept = 1, linetype = "dashed", color = "darkgreen", size = 1) +
+  annotate("text", x = 1, y = 8, label = "Optimal θ",
+           color = "darkgreen", size = 5, fontface = "bold") +
+  annotate("text", x = -2, y = 9.5, label = "Start: θ = -2",
+           color = "red", size = 4) +
+  annotate("text", x = descent_points$theta[6] + 0.6, y = descent_points$misfit[6] + 0.5,
+           label = "Converged!", color = "red", size = 4) +
+  labs(
+    title = "Gradient Descent: Sliding Down to Minimum Misfit",
+    subtitle = "Iteratively adjust θ to reduce the fit function",
+    x = "θ (Parameter)",
+    y = "Fit Function (Misfit)"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5, size = 16),
+    plot.subtitle = element_text(hjust = 0.5)
+  )
+```
+
+::: notes
+NOTE FOR STUDENTS WHO TOOK LOG REG WITH ME: In log reg we pictured this as
+gradient ASCENT - climbing UP to the peak of the log-likelihood. In SEM we
+MINIMIZE misfit, so it's gradient DESCENT - sliding DOWN into the valley. Same
+idea (follow the slope to the optimum), just flipped upside down because we're
+minimizing instead of maximizing.
+
+Start at arbitrary point
+Calculate slope (gradient) at current position
+Move in the direction that reduces misfit (downhill)
+Repeat until we reach the bottom of the valley
+
+**At any point on the curve:**
+
+Calculate the derivative (gradient) = slope at that point. Conceptually, the
+gradient tells us how the fit function changes as we nudge each parameter.
+
+**Interpretation:**
+
+- The gradient points uphill; we step in the opposite direction to reduce misfit
+- Steep slope → we're far from the optimum, take a bigger step
+- Gradient near 0 → we're at the bottom of the valley (best fit)!
+
+Gradient tells us which direction to move
+When gradient = 0, we've found the optimal parameters
+:::
+
+## Pause & Recap
+
+Gradient Descent represents a search for the best paramters. 
+
+Conceptually, how does it work? 
+
+## Updating Parameters: The Learning Process
+
+**Update Rule:**
+
+$$\theta_j^{\text{(new)}} = \theta_j^{\text{(old)}} - \text{step size} \times \text{gradient}$$
+
+Why a step size?
+
+- Gradient tells us the direction & steepness of the curve
+- Step size controls how far we move (a small increment, not a full unit)
+- Too large → might overshoot the valley
+- Too small → takes forever to converge
+
+::: notes
+This is the simple version. SEM software actually uses a more sophisticated
+version of this "follow the slope" idea - typically Newton-Raphson or Fisher
+scoring. Instead of just using the slope (gradient), these methods also use the
+curvature of the fit surface (the second derivative / information matrix) to
+figure out both the direction AND how big a step to take. That lets them take
+much smarter steps and converge in far fewer iterations.
+:::
+
+## Pause & Recap
+
+Objective: Maximum likelihood
+Search: Gradient descent
+How to update parameters: Update rule 
+
+Conceptually, how do these three work together? 
+
+
+::: notes
+
+- Step size matters; SEM software chooses it smartly using curvature
+- Small, well-chosen steps ensure we don't overshoot the minimum
+- Typical stopping criterion: change in the fit function < 0.0001
+- Usually converges in 10-100 iterations
+:::
+
+
+## Up Next
+
+Measured Variable Path Analysis Specification
+
+Prep: read the article
+

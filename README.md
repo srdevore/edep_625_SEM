@@ -75,22 +75,45 @@ You. may need to do a hard refresh (cmd + R)
 
 ## 5. Render Teacher version of slides
 
-To render and show the teacher version of the slides: 
+Anything inside `::: {.content-visible when-profile="teacher"}` is **stripped**
+from a normal render. "Teacher" is a per-render flag, not a mode you stay in.
+
+The teacher profile also writes to a **different folder**: `_teacher/`, not
+`_site/`. Rendering from the Quarto button or Cmd+Shift+K uses the default
+(student) profile, so notes will be missing — that is the usual reason they
+"disappear".
 
 ```{bash}
 # renders 
-quarto render lectures/test_lecture.qmd --profile teacher
+quarto render lectures/w02_regression_review.qmd --profile teacher
 ```
 
-In this presentation, press S to see the speaker notes version. 
-
-
-
+Open `_teacher/lectures/<deck>.html` — not `_site/...` — and press **S** for
+the speaker-notes view (allow popups).
 
 ```{bash}
 #downloads
 download _teacher/lectures/test_lecture.html
 ```
+
+### Speaker notes are never in the downloadable PDF
+
+The PDF on the Lectures page is built by CI from the **student** render
+(`publish.yml` runs decktape over `_site/lectures/*.html`), and decktape does
+not print `aside.notes` in any case.
+
+For a printable teacher copy with notes, add this to the deck's YAML and render
+with `--profile teacher`:
+
+```yaml
+format:
+  revealjs:
+    show-notes: separate-page
+```
+
+**Do not commit that setting enabled.** It makes notes visible to all viewers,
+and because it lives in the document it applies to the student build too — it
+would publish your answer keys.
 
 ## 6. Unstage the Python virtualenv
 

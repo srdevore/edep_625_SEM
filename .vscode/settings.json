@@ -1,0 +1,19 @@
+{
+  // VS Code's Python extension activates the virtualenv by typing
+  // "source .venv/bin/activate" into the active terminal, sending an
+  // interrupt first to clear the command line. That kills a running
+  // `quarto preview` mid-render, which shows up as a stray ^C and a blank
+  // page. Long renders (lecture decks with R chunks) are the ones hit;
+  // fast ones finish before the injection lands.
+  //
+  // Nothing in the Quarto render path uses Python, so turning this off
+  // costs nothing. Activate manually when needed:
+  //   source .venv/bin/activate
+  "python.terminal.activateEnvironment": false,
+  "python.terminal.activateEnvInCurrentTerminal": false,
+
+  // _site/ and _teacher/ are gitignored build output. Without this the
+  // Explorer hides them, so rendered decks look like they were never
+  // created -- but _teacher/ is the only place the teacher copy exists.
+  "explorer.excludeGitIgnore": false
+}

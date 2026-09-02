@@ -1,0 +1,22 @@
+---
+title: "Week 3: MVPA: Specification"
+date: today
+description: '<a href="lectures/w03_mvpa_specification.pdf" download="w03_mvpa_specification.pdf">Download PDF</a>'
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    embed-resources: true
+    self-contained-math: true
+release: week 2
+draft: true
+---
+
+
+# Agenda
+
+Mini Project 1
+Normal distribution > multivariate normal distribution
+Parameters in SEM
+exogenous, endogenous
+disruption vs error

@@ -12,12 +12,7 @@
 #   source .venv/bin/activate     # re-run this in every new terminal
 #   pip install datasets
 #
-# Fallback if sudo is unavailable -- installs into the container's system
-# Python, no venv, no root needed:
-#
-#   pip3 install --break-system-packages datasets
-#
-# Then run:  python3 snp_data.py
+
 #
 # ---------------------------------------------------------------------------
 # v1 -- the canonical datasets API. Kept for reference. Downloads 1.8GB the
@@ -89,3 +84,16 @@ for key, value in row.items():
     text = str(value)
     print(f"\n  {key}  (len={len(text):,})")
     print(f"    {text[:300]}")
+
+
+path = hf_hub_download(REPO, FILE, repo_type="dataset")
+pf = pq.ParquetFile(path)
+
+# Grab just the first 20 rows without reading the whole file
+first_batch = next(pf.iter_batches(batch_size=20))
+df = first_batch.to_pandas()
+
+print(df.shape)   # (20, num_columns)
+df.to_csv("sp500_first20.csv", index=False)
+
+
