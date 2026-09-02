@@ -83,8 +83,8 @@ intercept's meaning changes.
 ## Model 1.a Simple regression 2
 
 ```{r}
-m1 <- lm(READ_AVG ~ BOOKSHOME_c, data = pisa)
-summary(m1)
+m1a <- lm(READ_AVG ~ BOOKSHOME_c, data = pisa)
+summary(m1a)
 ```
 
 ## Model 2: Multiple regression
@@ -163,10 +163,10 @@ effect changing across levels of the other.
 
 ```{r}
 tibble(
-  Model     = c("M1: PAREDINT", "M2: PAREDINT + BOOKSHOME", "M3: PAREDINT x BOOKSHOME"),
-  R2        = c(summary(m1)$r.squared, summary(m2)$r.squared, summary(m3)$r.squared),
-  `Adj. R2` = c(summary(m1)$adj.r.squared, summary(m2)$adj.r.squared, summary(m3)$adj.r.squared),
-  AIC       = c(AIC(m1), AIC(m2), AIC(m3))
+  Model     = c("M1: PAREDINT", "M1a: BOOKSHOME", "M2: PAREDINT + BOOKSHOME", "M3: PAREDINT x BOOKSHOME"),
+  R2        = c(summary(m1)$r.squared, summary(m1a)$r.squared, summary(m2)$r.squared, summary(m3)$r.squared),
+  `Adj. R2` = c(summary(m1)$adj.r.squared, summary(m1a)$adj.r.squared, summary(m2)$adj.r.squared, summary(m3)$adj.r.squared),
+  AIC       = c(AIC(m1), AIC(m1a), AIC(m2), AIC(m3))
 )
 ```
 
