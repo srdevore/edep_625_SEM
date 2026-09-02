@@ -9,21 +9,24 @@ format:
     embed-resources: true
     self-contained-math: true
 release: week 2
+draft: true
 ---
 
 ## Agenda
 
 1. Methods walk through expectations & sign up
-2. Updates: lecture updated, office hrs updated
-3. Variance, covariance, correlation, regression, multiple regression, and interactions
-4. Systems of Equations
-5. Solving 2 ways
-4. R lab: review 
-5. Homework: Example paper of Measured Variable Path Analysis
+2. Logistics Updates
+3. Data discussion
+4. Variance, covariance, correlation, regression, multiple regression, and interactions
+5. R lab: Interpreting the models 
+5. Systems of Equations
+6. Solving 2 ways
+8. Homework: Example paper of Measured Variable Path Analysis
 
 ::: {.content-visible when-profile="teacher"}
 ::: {.fragment}
 The point of this week is to draw a contrast between models you've studied in the past and SEM. Understand the key thing that distinguishes SEM from regression. 
+
 :::
 :::
 
@@ -97,6 +100,26 @@ model_fit <- function(model) {
   )
 }
 ```
+
+## Updates
+
+1. Downloadable deck for w01 updated
+2. AI Fair Use for class added to syllabus
+  - living doc - open to future discussion
+3. Office hours: Changed to Mon 2:30-3:30 or by apt. Sign up link added
+
+## Data Discussions
+
+- < 1 min overview of the datasets you found 
+- What questions can you answer with them
+- Share with the class
+
+
+## Methods walk through
+
+Assignment: Lamaku > Assignments > methods walkthrough
+
+Template: Course website: https://srdevore.github.io/edep_625_sem/
 
 ## Variance
 
@@ -459,6 +482,13 @@ Original plan: show the two equations for this. ^ cannot be captured by
 regression, multiple regression or interaction effects.
 :::
 :::
+
+## Rlab 2
+
+
+- Write a short interpretation of each of the models. 
+- Compare the models: Which is the best? Why?  
+- Save somewhere you can easily find it again. We will come back to this in future weeks. 
 
 
 ## Solving Systems of Equqtions

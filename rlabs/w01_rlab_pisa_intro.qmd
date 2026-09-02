@@ -1,5 +1,5 @@
 ---
-title: "Lab: Familiarizing with PISA Data"
+title: "W01: Familiarizing with PISA Data"
 date: today
 description: '<a href="rlab-downloads/w01_rlab_pisa_intro.qmd" download="w01_rlab_pisa_intro.qmd">Download .qmd</a>'
 data: '<a href="rlab-downloads/w01_data_pisa22_USA_cln.csv" download="w01_data_pisa22_USA_cln.csv">w01_data_pisa22_USA_cln.csv</a>'

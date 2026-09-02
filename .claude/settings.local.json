@@ -23,7 +23,8 @@
       "Read(//home/rstudio/**)",
       "Read(//home/rstudio/.vscode-R/**)",
       "Read(//usr/local/lib/R/etc/**)",
-      "Bash(Rscript *)"
+      "Bash(Rscript *)",
+      "Bash(pdftotext _site/index.pdf -)"
     ]
   }
 }
