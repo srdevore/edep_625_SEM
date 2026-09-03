@@ -54,12 +54,6 @@ m1 <- lm(READ_AVG ~ PAREDINT_c, data = pisa)
 summary(m1)
 ```
 
-**Questions**
-
-1. In your own words, what is this model doing?
-2. $R^2$ indicates ________________________________________. What is its value here, and what does that value tell you about how well parent education predicts reading score?
-3. The estimate for `PAREDINT_c` indicates ________________________________________. Is it statistically significant? How do you know?
-4. What does the intercept represent here, now that `PAREDINT_c` is mean-centered?
 
 ::: {.content-visible when-profile="teacher"}
 **Sample answer.** This model predicts reading score from a single variable,
