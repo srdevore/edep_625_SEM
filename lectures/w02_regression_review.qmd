@@ -109,9 +109,10 @@ model_fit <- function(model) {
 
 ## Data Discussions
 
-- < 1 min overview of the datasets you found 
-- What questions can you answer with them
-- Share with the class
+- What is the data set? 
+- Where did it come from? 
+- Examples of interesting variables
+- What research questions you could address with it
 
 
 ## Methods walk through
@@ -390,10 +391,7 @@ coef_table(m3)
 
 ::: {.content-visible when-profile="teacher"}
 ::: {.fragment}
-Target answer: how parent education predicts reading controlling for books at
-home and vice versa, AND how the two together predict reading. The lines are
-no longer parallel: the parent-education slope depends on how many books are
-in the home.
+Target answer: for a one-unit increase in x1, the effect of x2 on outcome is + estimate; or for a one-unit increase in x2, the effect of x1 on outcome is + estimate. so we add the main effect of the first estimate + the interaction estimate?
 
 Here the main effects do the work. Adding the interaction moves $R^2$ from
 `r fmt(summary(m2)$r.squared, 3)` to `r fmt(summary(m3)$r.squared, 3)` and the
@@ -466,7 +464,7 @@ regression, multiple regression or interaction effects.
 - Save somewhere you can easily find it again. We will come back to this in future weeks. 
 
 
-## Solving Systems of Equqtions 1
+## Solving Systems of Equations 1
 
 ```{r}
 #| include: false
@@ -481,44 +479,44 @@ b1 <- cov_br / var_b
 b0 <- read_mean - b1 * books_mean
 ```
 
-Two equations, four unknowns
+Two equations, four unknown variables & 2 disturbances
 
-$$\text{Books} = a_0 + a_1(\text{ParentEd}) + d_B$$
-$$\text{Reading} = b_0 + b_1(\text{Books}) + d_R$$
+$$\text{Books} = a_0 + a_1(\text{ParentEd}) + \zeta_B$$
+$$\text{Reading} = b_0 + b_1(\text{Books}) + \zeta_R$$
 
-Unknowns: $a_0$, $a_1$, $b_0$, $b_1$.
+Paramters: $a_0$, $a_1$, $b_0$, $b_1$, $zeta_B$, $zeta_R$, Var(ParentEd).
 
-The SEM idea: set the covariances the model *implies* equal to the covariances
-we actually *observe*, then solve for the parameters.
+This equation system implies covariances.
+We use the model-implied covariances to solve.
 
 ## First Equation — Step 1: The model
 
-$$\text{Books} = a_0 + a_1(\text{ParentEd}) + d_B$$
+$$\text{Books} = a_0 + a_1(\text{ParentEd}) + \zeta_B$$
 
-$d_B$ is the disturbance (what ParentEd does not explain). In SEM we assume it
+$\zeta_B$ is the disturbance (what ParentEd does not explain). In SEM we assume it
 is uncorrelated with the predictor:
 
-$$\mathrm{cov}(\text{ParentEd},\, d_B) = 0$$
+$$\mathrm{cov}(\text{ParentEd},\, \zeta_B) = 0$$
 
 ## First Equation — Step 2: Covary both sides with ParentEd
 
 Take the covariance of each side with ParentEd:
 
 $$\mathrm{cov}(\text{ParentEd},\, \text{Books})
-= \mathrm{cov}\big(\text{ParentEd},\; a_0 + a_1\text{ParentEd} + d_B\big)$$
+= \mathrm{cov}\big(\text{ParentEd},\; a_0 + a_1\text{ParentEd} + \zeta_B\big)$$
 
 ## First Equation — Step 3: Distribute the covariance
 
 $$\mathrm{cov}(\text{ParentEd}, \text{Books}) =
 \mathrm{cov}(\text{ParentEd}, a_0)
 + a_1\,\mathrm{cov}(\text{ParentEd}, \text{ParentEd})
-+ \mathrm{cov}(\text{ParentEd}, d_B)$$
++ \mathrm{cov}(\text{ParentEd}, \zeta_B)$$
 
 ## First Equation — Step 4: Simplify each term
 
 - $\mathrm{cov}(\text{ParentEd}, a_0) = 0$ &nbsp; (covariance with a constant)
 - $\mathrm{cov}(\text{ParentEd}, \text{ParentEd}) = s^2_{\text{ParentEd}}$
-- $\mathrm{cov}(\text{ParentEd}, d_B) = 0$ &nbsp; (our assumption)
+- $\mathrm{cov}(\text{ParentEd}, \zeta_B) = 0$ &nbsp; (our assumption)
 
 $$\mathrm{cov}(\text{ParentEd}, \text{Books}) = a_1\, s^2_{\text{ParentEd}}$$
 
@@ -540,53 +538,16 @@ $$a_0 = \overline{\text{Books}} - a_1 \times \overline{\text{ParentEd}}
 = `r fmt(books_mean, 2)` - `r fmt(a1, 3)` \times `r fmt(pared_mean, 2)`
 = `r fmt(a0, 2)`$$
 
-## Second Equation — Step 1: The model
+## Second Equation 
 
-$$\text{Reading} = b_0 + b_1(\text{Books}) + d_R$$
-
-Same assumption, one link later in the chain:
-
-$$\mathrm{cov}(\text{Books},\, d_R) = 0$$
-
-## Second Equation — Step 2: Covary both sides with Books
-
-$$\mathrm{cov}(\text{Books},\, \text{Reading})
-= \mathrm{cov}\big(\text{Books},\; b_0 + b_1\text{Books} + d_R\big)$$
-
-## Second Equation — Step 3: Distribute the covariance
-
-$$\mathrm{cov}(\text{Books}, \text{Reading}) =
-\mathrm{cov}(\text{Books}, b_0)
-+ b_1\,\mathrm{cov}(\text{Books}, \text{Books})
-+ \mathrm{cov}(\text{Books}, d_R)$$
-
-## Second Equation — Step 4: Simplify each term
-
-- $\mathrm{cov}(\text{Books}, b_0) = 0$ &nbsp; (covariance with a constant)
-- $\mathrm{cov}(\text{Books}, \text{Books}) = s^2_{\text{Books}}$
-- $\mathrm{cov}(\text{Books}, d_R) = 0$ &nbsp; (our assumption)
-
-$$\mathrm{cov}(\text{Books}, \text{Reading}) = b_1\, s^2_{\text{Books}}$$
-
-## Second Equation — Step 5: Solve for $b_1$
-
-$$b_1 = \frac{\mathrm{cov}(\text{Books}, \text{Reading})}{s^2_{\text{Books}}}$$
-
-## Second Equation — Step 6: Plug in the numbers
-
-$$b_1 = \frac{`r fmt(cov_br, 2)`}{`r fmt(var_b, 3)`} = `r fmt(b1, 2)`$$
-
-## Second Equation — Step 7: Back out the intercept $b_0$
-
-$$b_0 = \overline{\text{Reading}} - b_1 \times \overline{\text{Books}}
-= `r fmt(read_mean, 1)` - `r fmt(b1, 2)` \times `r fmt(books_mean, 2)`
-= `r fmt(b0, 1)`$$
+Repeat the steps for the second equation.
 
 ## The Solved System
 
 $$\widehat{\text{Books}} = `r fmt(a0, 2)` + `r fmt(a1, 3)`(\text{ParentEd})$$
 $$\widehat{\text{Reading}} = `r fmt(b0, 1)` + `r fmt(b1, 2)`(\text{Books})$$
 
+- Solved using model-implied covariances algebraically
 - Merely ~14 steps 
 - simplest possible MVPA model
 
@@ -603,12 +564,12 @@ to be solved for. Show how we solve for each.
 
 Objective: 
 
-- Find the $\beta$ values & other parameters that **maximize** the **likelihood** of the observed data.
-- Given a candidate set of parameters, how likely is it that I'd see exactly this pattern of real values? 
+- Find the parameter values that **maximize** the **likelihood** of the observed data.
+- Given a candidate set of parameters, how **likely** is it that I'd see exactly this pattern of real values? 
 
 ## Maximum Likelihood Estimation (MLE)
 
-- Initialize the parameters ($\theta$) with reasonable start values (e.g., from the observed covariances)
+- Initialize the parameters ($\theta$) with reasonable starting guesses. 
 
 ::: notes
 Maximum likelihood: find parameters that make the observed data most probable.
@@ -659,11 +620,25 @@ to reproducing S instead of reproducing individual outcomes.
   from the log reg log-likelihood, where less-negative was better.)
 :::
 
+## Maximum likelihood 
+$$F_{ML} = \log|\Sigma(\theta)| + \text{tr}(S\,\Sigma(\theta)^{-1}) - \log|S| - p$$
+
+Where:
+
+- log|Σ(θ)|:  a single number representing total model-implied variance 
+- tr(SΣ(θ)⁻¹): how well the model structure fits the actual data
+- log|S|: how much variance is in the observed data
+
 ## Pause & Recap
 
-Maximum likelihood estimation represents the objective of what we want to do. 
+Maximum likelihood estimation represents the **objective** of what we want to do. 
 
 Conceptually, what is our objective? 
+
+## Gradient Descent: 
+
+Maximizing the likelihood of the observed data
+= minimizing the distance between model-implied and observed covariance matrices
 
 ## Gradient Descent: Finding the Valley
 
@@ -753,8 +728,6 @@ Conceptually, how does it work?
 
 $$\theta_j^{\text{(new)}} = \theta_j^{\text{(old)}} - \text{step size} \times \text{gradient}$$
 
-Why a step size?
-
 - Gradient tells us the direction & steepness of the curve
 - Step size controls how far we move (a small increment, not a full unit)
 - Too large → might overshoot the valley
@@ -772,7 +745,9 @@ much smarter steps and converge in far fewer iterations.
 ## Pause & Recap
 
 Objective: Maximum likelihood
+
 Search: Gradient descent
+
 How to update parameters: Update rule 
 
 Conceptually, how do these three work together? 
@@ -790,6 +765,8 @@ Conceptually, how do these three work together?
 ## Up Next
 
 Measured Variable Path Analysis Specification
+
+Review anything new from today!!
 
 Prep: read the article
 

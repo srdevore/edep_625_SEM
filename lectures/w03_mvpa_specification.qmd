@@ -16,7 +16,11 @@ draft: true
 # Agenda
 
 Mini Project 1
+Measured variables vs latent variables
 Normal distribution > multivariate normal distribution
 Parameters in SEM
 exogenous, endogenous
 disruption vs error
+
+Model-implied covariances (tracing paths)
+R/lavaan gui
