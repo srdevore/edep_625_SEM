@@ -1,0 +1,139 @@
+---
+title: "Lab: SEM FUNdamentals"
+date: today
+description: '<a href="rlab-downloads/rlabs/w03_sem.qmd" download="rlabs/w03_sem.qmd">Download .qmd</a>'
+data: '<a href="rlab-downloads/w01_data_pisa22_USA_cln.csv" download="w01_data_pisa22_USA_cln.csv">w01_data_pisa22_USA_cln.csv</a>'
+format: html
+release: week 3
+draft: true
+---
+
+
+## SEM FUNdamentals: a simple path model
+
+Instead of putting `PAREDINT` and `BOOKSHOME` into one equation as competing
+predictors, we can specify a small *system* of equations: parent education
+predicts books at home, and books at home predicts reading score.
+
+$$\widehat{\text{Books}} = a_0 + a_1(\text{ParentEd}) \qquad
+\widehat{\text{Reading}} = b_0 + b_1(\text{Books})$$
+
+In `lavaan`, each regression is written with `~` ("is predicted by") and the
+whole system is estimated at once:
+
+```{r}
+#| warning: false
+path_model <- "
+  BOOKSHOME ~ PAREDINT
+  READ_AVG  ~ BOOKSHOME
+"
+
+fit <- sem(path_model, data = pisa)
+summary(fit, standardized = TRUE, fit.measures = TRUE, rsquare = TRUE)
+```
+
+`lavaan` itself has no built-in plotting -- diagrams come from a companion
+package. `lavaanPlot` draws the model straight from the fitted object, so the
+picture is always in sync with the numbers above:
+
+```{r}
+lavaanPlot(model = fit, coefs = TRUE, stand = TRUE, stars = "regress")
+```
+
+**Questions**
+
+1. `BOOKSHOME` is on the left of one equation and the right of another. Could you have specified that in a single `lm()` call? Why or why not?
+2. What does the $R^2$ for the `BOOKSHOME` equation mean? What does the $R^2$ for the `READ_AVG` equation mean? How are these different from a single $R^2$ for the whole model?
+3. Compare the `BOOKSHOME ~ PAREDINT` estimate here to Model 2's `PAREDINT` estimate. Why are they different?
+4. This is the one model in this lab where you're given a Chi-square test of *model fit* ("Model Test User Model"). None of the regression models could give you that. What do you think that test is checking?
+
+::: {.content-visible when-profile="teacher"}
+**Sample answer.** No single `lm()` call can do this: `lm()` estimates one
+equation with one outcome, and here `BOOKSHOME` needs to be an outcome in one
+equation and a predictor in another. That is exactly what regression, multiple
+regression, and interaction models cannot represent -- they force every
+variable to be either a predictor or an outcome, never both at once.
+
+There are two separate $R^2$ values because there are two separate equations:
+$R^2$ = `r fmt(lavInspect(fit, "rsquare")[["BOOKSHOME"]], 3)` for how well
+parent education predicts books at home, and $R^2$ =
+`r fmt(lavInspect(fit, "rsquare")[["READ_AVG"]], 3)` for how well books at
+home predicts reading. A single regression only ever gives you one $R^2$ for
+one outcome; this model is explaining variance in *two* variables at once.
+
+The `BOOKSHOME ~ PAREDINT` estimate here
+(`r fmt(coef(fit)[["BOOKSHOME~PAREDINT"]], 3)`) is a *simple* regression of
+books on parent education -- it is not adjusted for anything else, so it is
+not directly comparable to Model 2's `PAREDINT` coefficient, which was
+adjusted for books at home. This is the same "simple vs. controlled" logic
+from Models 1 and 2, just applied to a different pair of variables.
+
+The chi-square test compares the correlations/covariances this model implies
+among `PAREDINT`, `BOOKSHOME`, and `READ_AVG` to the correlations/covariances
+actually observed in the data. A regression is always *saturated* -- it has
+exactly as many parameters as there are pieces of information to fit, so it
+always fits perfectly and there is nothing to test. This path model leaves out
+a direct arrow from `PAREDINT` to `READ_AVG`, which is a testable claim (that
+parent education matters for reading *only* through books at home). With df =
+`r as.integer(fitMeasures(fit, "df"))` and $p$ =
+`r fmt(fitMeasures(fit, "pvalue"), 3)`, that claim doesn't perfectly hold in
+this sample -- a hint that a direct path might belong in the model too, which
+is exactly where we're headed next week.
+:::
+
+### Going further: the indirect effect (optional)
+
+We can label the two paths and ask `lavaan` to compute their product directly
+-- the *indirect effect* of parent education on reading, transmitted through
+books at home.
+
+```{r}
+#| warning: false
+path_model_labeled <- "
+  BOOKSHOME ~ a*PAREDINT
+  READ_AVG  ~ b*BOOKSHOME
+
+  indirect := a*b
+"
+
+fit_labeled <- sem(path_model_labeled, data = pisa)
+parameterEstimates(fit_labeled)
+```
+
+```{r}
+lavaanPlot(model = fit_labeled, coefs = TRUE, stand = TRUE, stars = "regress")
+```
+
+The `indirect` row is $a \times b$: the predicted change in reading score for
+a one-year increase in parent education, acting *through* books at home.
+Notice the diagram looks identical to the one above -- `lavaanPlot` only draws
+the actual `~` paths in the model (the arrows we specified), and `indirect`
+isn't one of them. It's a *defined parameter*, a quantity computed from `a`
+and `b` after the fact, not a separate arrow lavaan estimated. Same model,
+same picture; the indirect effect is a summary of two of its paths, not a
+third path.
+
+::: {.content-visible when-profile="teacher"}
+**Sample answer / notes.** Indirect effect =
+`r fmt(coef(fit_labeled)[["a"]], 3)` x `r fmt(coef(fit_labeled)[["b"]], 2)` =
+`r fmt(coef(fit_labeled)[["a"]] * coef(fit_labeled)[["b"]], 2)` reading points
+per year of parent education, and it's significant. This is a preview of
+mediation -- formal treatment (and the direct path suggested by the
+significant chi-square above) is coming in the next couple of weeks.
+:::
+
+## Wrap-up
+
+1. Of the three regression models and the SEM path model, which one gives you the most complete story about how parent education, books at home, and reading score relate to each other? Why?
+2. What is fundamentally different about how the SEM model is *specified*, regardless of which model has the higher $R^2$?
+
+::: {.content-visible when-profile="teacher"}
+**Sample answer.** "Best $R^2$" and "most complete story" are different
+questions. Model 2/3 fit the data about as well in the narrow sense of
+variance explained, but the SEM model is the only one that lets `BOOKSHOME`
+play both roles (outcome and predictor) and gives a directional,
+mediation-style account: parent education -> books at home -> reading. The
+regression models can only ever ask "how much does each predictor add,"
+never "does one predictor work through the other." That structural
+difference -- not a bigger $R^2$ -- is the point of this lab.
+:::
