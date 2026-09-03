@@ -9,6 +9,17 @@ draft: true
 ---
 
 
+## Setup
+
+```{r}
+#| message: false
+library(tidyverse)
+library(lavaan)
+library(lavaanPlot)
+
+pisa <- read_csv("w01_data_pisa22_USA_cln.csv", show_col_types = FALSE)
+```
+
 ## SEM FUNdamentals: a simple path model
 
 Instead of putting `PAREDINT` and `BOOKSHOME` into one equation as competing
