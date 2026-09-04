@@ -9,7 +9,6 @@ format:
     embed-resources: true
     self-contained-math: true
 release: week 2
-draft: true
 ---
 
 ## Agenda

@@ -8,7 +8,7 @@ format:
     slide-number: true
     embed-resources: true
     self-contained-math: true
-release: week 2
+release: week 3
 draft: true
 ---
 
