@@ -19,3 +19,6 @@ lectures/_metadata.yml
 venv/
 __pycache__/
 *.pyc
+
+# WIP draft -- erroring, excluded until fixed
+rlabs/w03_sem.qmd

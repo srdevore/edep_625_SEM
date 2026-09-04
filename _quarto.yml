@@ -8,6 +8,7 @@ project:
   # README.md and anything starting with "_", but not other .md files.
   render:
     - "**/*.qmd"
+    - "!rlabs/w03_sem.qmd"  # WIP draft -- excluded from render for now
 
 profile:
   default: student
