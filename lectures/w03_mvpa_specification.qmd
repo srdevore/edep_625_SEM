@@ -48,11 +48,88 @@ Were any variables left out?
 
 # Key terminology
 
-Here I want to define & explain these key terms. It's fine to split over multiple slides. Feel free to use illustrations/examples.
-- Measured vs latent variables: here use our variables as the measured & "academic performance", "intelligence", and "problem-solving ability" as contrasting (latent) examples. Note that "measured" and "observed" are synonyms, and that we are currently working with measured variables.
-- Exogenous vs endogenous variables: use the example of parented > books > reading score
-- Disturbance
-- Parameters also use our example of parente ed > books, reading score & highlight the 
+## Measured vs. latent variables
+
+**Measured** (a.k.a. **observed**) variables are recorded directly in the data.
+
+- Our variables: **reading score**, **books at home**, **parent education**.
+
+**Latent** variables are *not* observed directly — they are inferred from patterns among measured variables.
+
+- Contrasting examples: **academic performance**, **intelligence**, **problem-solving ability**.
+
+::: {.fragment}
+Right now, every variable in our model is **measured**.
+:::
+
+::: {.content-visible when-profile="teacher"}
+::: {.notes}
+"Measured" and "observed" mean the same thing — flag the synonym explicitly.
+Latent variables (intelligence, etc.) are what the second half of the course is
+about: you never see them directly, you estimate them from measured indicators.
+For now we are working entirely with measured variables.
+:::
+:::
+
+## Exogenous vs. endogenous variables
+
+Running example: **parent education → books at home → reading score**.
+
+- **Exogenous:** nothing in the model explains it. *(parent education)*
+- **Endogenous:** something in the model explains it. *(books at home, reading score)*
+
+::: {.fragment}
+Books at home is explained by parent education **and** it predicts reading — so
+it is endogenous.
+:::
+
+::: {.content-visible when-profile="teacher"}
+::: {.notes}
+Simple test students can apply later: does anything in the model predict this
+variable? If yes, it's endogenous; if no, it's exogenous. Books at home playing
+both roles (outcome of parent education, predictor of reading) is exactly what
+regression could not handle — the setup for why we need SEM.
+:::
+:::
+
+## Disturbance
+
+Every **endogenous** variable has a **disturbance** ($\zeta$): everything that
+affects it but is *not* in the model.
+
+- The SEM counterpart of a regression **residual** / error term.
+- **Exogenous** variables have no disturbance — nothing in the model predicts them.
+
+In our example, books at home and reading score each get a disturbance;
+parent education does not.
+
+::: {.content-visible when-profile="teacher"}
+::: {.notes}
+$\zeta_B$ = everything besides parent education driving books at home;
+$\zeta_R$ = everything besides books at home driving reading. Same idea as a
+regression residual. As in Week 2, we assume the disturbance is uncorrelated
+with the predictors: cov(ParentEd, ζ_B) = 0.
+:::
+:::
+
+## Parameters
+
+**Parameters** are the quantities the model estimates.
+
+In our parent education → books → reading example:
+
+- **Paths** — the effect of parent education on books, and of books on reading.
+- **The variance** of parent education (the exogenous variable).
+- **The disturbance variances** of books at home and reading score.
+
+::: {.content-visible when-profile="teacher"}
+::: {.notes}
+Keep this conceptual for now — just name the kinds of parameters (paths,
+variances, disturbance variances). We will count them precisely and connect the
+count to the number of variances/covariances later, which is where
+"just-identified" comes in. Don't introduce that yet.
+:::
+:::
 
 # Observed Covariance
 
