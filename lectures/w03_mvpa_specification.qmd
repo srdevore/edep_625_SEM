@@ -15,12 +15,87 @@ draft: true
 
 # Agenda
 
-Mini Project 1
-Measured variables vs latent variables
-Normal distribution > multivariate normal distribution
-Parameters in SEM
-exogenous, endogenous
-disruption vs error
 
+Model-implied covariances
+Normal distribution > multivariate normal distribution
+Variables
+Parameters in SEM
+disturbance vs error
+Mini Project 1 
+R/lavaan gui
+
+
+
+::: {.content-visible when-profile="teacher"}
+::: {.fragment}
+Mini Project 1 Introduction
+Multivariate normal distribution
+Variables
+  - Measured variables vs latent variables
+  - exogenous, endogenous
+Parameters in SEM
+  - variances, disturbance, estimates
 Model-implied covariances (tracing paths)
 R/lavaan gui
+:::
+:::
+
+# Paper Discussion
+
+Theoretical motivation for the variables in the model? 
+Theoretical motivation for the relationships between variables in the model?
+Were any variables left out? 
+
+# Key terminology
+
+Here I want to define & explain these key terms. It's fine to split over multiple slides. Feel free to use illustrations/examples.
+- Measured vs latent variables: here use our variables as the measured & "academic performance", "intelligence", and "problem-solving ability" as contrasting (latent) examples. Note that "measured" and "observed" are synonyms, and that we are currently working with measured variables.
+- Exogenous vs endogenous variables: use the example of parented > books > reading score
+- Disturbance
+- Parameters also use our example of parente ed > books, reading score & highlight the 
+
+# Observed Covariance
+
+Here I'd like to insert the covariancex matrix of reading, books, and parented. In our model, we want to maximise the likelihood of getting this covariance matrix
+
+# Model-implied covariance matrix
+
+Key points: The covariance matrix that the model implies, determined by tracing rules, which are derived algebraically. We maximize the likelihood of getting the observed covariance matrix by minimizing the distance between this and the observed data.
+
+# Review
+
+Conceptually, how do we minimize distance between the observed & model-predicted matrices? 
+
+Key concepts: maximum likelihood function, gradient descent, update rule
+
+# Model-implied Covariance
+
+How do we know what this is? 
+
+
+# Example: Books as a mediator
+
+Here, I'd like to show the system of equations on the top, as it was in lectures/w02_regression_review.qmd for the measured variable path analysis parentEd > books > reading score. I'd also like the model diagram on the bottom. Key point: these are two ways of representing the exact same thing. 
+
+# The tracing rules
+
+We get the model-implied covariance (or variance) between two variables by using these tracing rules:
+
+1. Find every legitimate route connecting the two variables (or the same variable to itself, for a variance).
+2. A route may go backward against an arrowhead, then forward with an arrowhead — but never forward-then-backward. You can reverse direction only once, and only at a common cause.
+3. A route may pass through at most one curved double-headed (covariance) arrow, and only at the route's turning point.
+4. Never pass through the same variable twice in one route (no loops).
+5. Multiply all the coefficients along a route.
+6. Sum the products across all legitimate routes — that sum is the model-implied covariance (or variance, if tracing a variable to itself).
+
+# Getting the model-implied covariance matrix
+
+I want to show the observed matrix again on the right, then on the left, the observed matrix but not the numbers, the equations used to get the numbers (even diagonals). It's ok if the second is larger than the first. I just want to seque into how we calculate things. I'll emphasie that for this, we have known values, so we just plug numbners into the equations.
+
+# Getting the model-implied covariance matrix 2
+Here, we have unknown parameters, and theoretically predicted relationships between variables. We draw a model based on those theoretically predicted relationships to get the model-implied covariance matrix. I want to show the model diagram on the left side and the covariance matrix on the right. I want to click to fill each cell of the model-impleid covariance matrix, and highlight the area of the model from which it is derived. 
+
+# The model parameters
+
+The relationship between the number of parameteris and variance covariances. Tease "just-identified" as something that will come up in the future. 
+
