@@ -15,7 +15,7 @@ draft: true
 
 # Agenda
 
-
+Paper Discussion
 Model-implied covariances
 Normal distribution > multivariate normal distribution
 Variables
@@ -77,6 +77,8 @@ How do we know what this is?
 
 Here, I'd like to show the system of equations on the top, as it was in lectures/w02_regression_review.qmd for the measured variable path analysis parentEd > books > reading score. I'd also like the model diagram on the bottom. Key point: these are two ways of representing the exact same thing. 
 
+# Drawing the diagrams
+
 # The tracing rules
 
 We get the model-implied covariance (or variance) between two variables by using these tracing rules:
@@ -98,4 +100,13 @@ Here, we have unknown parameters, and theoretically predicted relationships betw
 # The model parameters
 
 The relationship between the number of parameteris and variance covariances. Tease "just-identified" as something that will come up in the future. 
+
+
+# Mini-project 1
+
+
+# Lavaan GUI
+
+- Demo how to specify example model
+- Rlab: Considering Mini project 1: Start thinking about how to specify your own model.
 
